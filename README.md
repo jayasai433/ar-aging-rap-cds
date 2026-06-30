@@ -46,6 +46,28 @@ S/4HANA Cloud Public Edition 2602. Namespace prefix: Y (YI_ = interface layer, Y
   table. Whether Fiori Elements List Report/Analytical List Page supports literal merged headers is
   still unverified and may require a freestyle UI5 extension - treat as a separate spike.
 
+## Field coverage update (second pass)
+
+Originally pushed without: Customer Name, Customer Branch, GL Account Name, Project Name, Sales Name
+(associations existed but fields were never selected), plus BP Group, Invoice Description, Invoice
+Date (header-level, distinct from item-level Posting Date), Company Name, and a readable Payment
+Terms text were missing entirely. All of these have now been added across `YI_AROPITEM`, `YI_ARAGING`,
+and `YC_ARAGING`.
+
+Still NOT resolved, by design (need your input, not guessed):
+
+- **DSO (Days Sales Outstanding)**: not implemented. Your spec sheet shows it as an aggregate
+  per-customer metric (Image 4/5), which doesn't fit cleanly into a per-line-item CDS view - it would
+  typically be a separate aggregation query or a measure computed in the Fiori Elements Analytical
+  List Page, not a row-level field. Confirm whether this is in scope for this CDS build at all before
+  it gets added.
+- **Receipt Date / Payment Date** (spec sheet column AC): not exposed. Unclear if this duplicates
+  `ClearingDate` or is a genuinely separate field (e.g. bank receipt date vs. system clearing date).
+- New associations added this pass (`_AccountingDocumentHeader`, `_BPGroup`, `_CompanyCodeText`) and
+  the fields read through them (`InvoiceDate`, `InvoiceDescription`, `BPGroupCode`/`BPGroupName`,
+  `CompanyName`, `CustomerBranch`, `ProjectName`, `SalesName`, `PaymentTermsText`) are UNVERIFIED
+  element names - confirm each one in ADT before activation, same caution as the original field list.
+
 ## Things confirmed via SAP documentation during this build
 
 - `DATS_DAYS_BETWEEN(date1, date2)` and `DATS_ADD_DAYS(date, days, on_error)` syntax.

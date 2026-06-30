@@ -24,16 +24,35 @@ define root view entity YC_ARAGING
       @UI.selectionField: [{ position: 20 }]
       CompanyCodeOut,
 
+      @UI.lineItem: [{ position: 21 }]
+      CompanyName,
+
       @UI.lineItem: [{ position: 30 }]
       CompanyBranch,
+
+      @UI.lineItem: [{ position: 35 }]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'I_BusinessPartnerGrouping', element: 'BusinessPartnerGrouping' } }]
+      BPGroupCode,
+
+      @UI.lineItem: [{ position: 36 }]
+      BPGroupName,
 
       @UI.lineItem: [{ position: 40 }]
       @UI.selectionField: [{ position: 30 }]
       @Consumption.valueHelpDefinition: [{ entity: { name: 'I_Customer', element: 'Customer' } }]
       CustomerCode,
 
+      @UI.lineItem: [{ position: 41 }]
+      CustomerName,
+
+      @UI.lineItem: [{ position: 42 }]
+      CustomerBranch,
+
       @UI.lineItem: [{ position: 50 }]
       GLAccount,
+
+      @UI.lineItem: [{ position: 51 }]
+      GLAccountName,
 
       @UI.lineItem: [{ position: 60 }]
       @UI.selectionField: [{ position: 40 }]
@@ -45,11 +64,20 @@ define root view entity YC_ARAGING
       @UI.lineItem: [{ position: 80 }]
       InvoiceReference,
 
+      @UI.lineItem: [{ position: 85 }]
+      InvoiceDescription,
+
       @UI.lineItem: [{ position: 90 }]
       BillingNumber,
 
       @UI.lineItem: [{ position: 100 }]
       WBSElementInternalID,
+
+      @UI.lineItem: [{ position: 101 }]
+      ProjectName,
+
+      @UI.lineItem: [{ position: 102 }]
+      SalesName,
 
       @Semantics.amount.currencyCode: 'TransactionCurrency'
       @UI.lineItem: [{ position: 110 }]
@@ -66,10 +94,15 @@ define root view entity YC_ARAGING
       @Semantics.currencyCode: true
       TransactionCurrency,
 
+      InvoiceDate,
       PostingDate,
       BaselineDate,
       ClearingDate,
+      PaymentTermsCode,
+      PaymentTermsText,
       KeyDateOut,
+      // "Receipt Date/Payment Date" (your spec column AC) intentionally not exposed yet -
+      // see README, needs your confirmation on whether it equals ClearingDate or is separate.
 
       // =========================================================
       // Invoice Status - NULL-safe, fixed-value dropdown

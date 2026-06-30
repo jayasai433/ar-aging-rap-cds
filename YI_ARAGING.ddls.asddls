@@ -24,14 +24,23 @@ define view entity YI_ARAGING
 
       Item.FiscalYearNum,
       Item.CompanyCode          as CompanyCodeOut,         // avoid name clash, kept for downstream readability
+      Item.CompanyName,
       Item.CompanyBranch,
       Item.CustomerCode,
+      Item.CustomerName,
+      Item.CustomerBranch,
+      Item.BPGroupCode,
+      Item.BPGroupName,
       Item.GLAccount,
+      Item.GLAccountName,
       Item.DocumentType,
       Item.JournalEntry,
       Item.InvoiceReference,
       Item.BillingNumber,
+      Item.InvoiceDescription,
       Item.WBSElementInternalID,
+      Item.ProjectName,
+      Item.SalesName,
 
       Item.InvoiceAmount,
       Item.TransactionCurrency,
@@ -43,6 +52,7 @@ define view entity YI_ARAGING
       // Remaining Amount - single arithmetic expression, no nested aggregate
       Item.InvoiceAmount - coalesce( Item._ClearingAgg.PaidAmount, 0 ) as RemainingAmount,
 
+      Item.InvoiceDate,
       Item.PostingDate,
       Item.BaselineDate,
       Item.ClearingDate,
@@ -51,6 +61,7 @@ define view entity YI_ARAGING
       // ---- Net payment days from payment terms lookup ----
       // Field name NetPaymentDays is a placeholder pending confirmation of I_PaymentTerms element name.
       _PaymentTerms.NetPaymentDays as NetPaymentDays,
+      _PaymentTerms.PaymentTermsName as PaymentTermsText, // field name unverified - confirm against released payment terms view
 
       // ---- Due Date - Invoice Date basis ----
       dats_add_days(
