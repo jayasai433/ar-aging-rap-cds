@@ -1,0 +1,6 @@
+@EndUserText.label: 'AR Aging Report Service'
+define service YC_ARAGING_SD {
+  expose YC_ARAGING;
+  expose YI_INVOICESTATUS_VH;
+  expose YI_AGINGCATEGORY_VH;
+}
