@@ -1,4 +1,4 @@
-CLASS ycl_invoicestatus_vh DEFINITION
+CLASS ycl_fi_invstatus_vh DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC.
@@ -9,7 +9,7 @@ CLASS ycl_invoicestatus_vh DEFINITION
 ENDCLASS.
 
 
-CLASS ycl_invoicestatus_vh IMPLEMENTATION.
+CLASS ycl_fi_invstatus_vh IMPLEMENTATION.
 
   METHOD if_rap_query_provider~select.
 

@@ -3,12 +3,12 @@
 @AccessControl.authorizationCheck: #CHECK
 @EndUserText.label: 'AR Aging - Remaining Amount and Due Dates (Interface)'
 @VDM.viewType: #COMPOSITE
-define view entity YI_ARAGING
+define view entity YI_FI_ARAGING
   with parameters
     @Environment.systemField: #SYSTEM_DATE
     P_KeyDate : abap.dats
 
-  as select from YI_AROPITEM as Item
+  as select from YI_FI_AROPITEM as Item
 
 {
   key Item.AccountingDocument,

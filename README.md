@@ -153,3 +153,46 @@ field names get corrected against real, confirmed data - not guesses.
   that is itself sourced FROM this association) - now fixed to join on `Customer`/`BusinessPartner`
   instead, which are confirmed real keys on the associated view.
 
+
+## Fourth pass - renamed to match org naming convention (module = FI)
+
+The person shared their org's ABAP/CDS naming convention document. All objects renamed to fit
+`Y<Prefix>_<Module>_<Name>` (or the service/service-binding specific pattern):
+
+| Old name | New name |
+|---|---|
+| `YI_AROPITEM` | `YI_FI_AROPITEM` |
+| `YI_ARCLEARINGAGG` | `YI_FI_ARCLRAGG` |
+| `YI_ARAGING` | `YI_FI_ARAGING` |
+| `YI_ARSALESPARTNER` | `YI_FI_ARSLSPTNR` |
+| `YC_ARAGING` | `YC_FI_ARAGING` |
+| `YC_ARAGING` (ddlx) | `YC_FI_ARAGING` (unchanged pattern - metadata extension name matches CDS name per convention) |
+| `YC_ARAGING_SD` | `YUI_FI_ARAGING_SRV` (ServiceType=UI, no OData protocol suffix added yet - confirm O2/O4 with the person before service binding) |
+| `YI_INVOICESTATUS_VH` | `YI_FI_INVSTATUS_VH` |
+| `YI_AGINGCATEGORY_VH` | `YI_FI_AGINGCAT_VH` |
+| `YCL_INVOICESTATUS_VH` | `YCL_FI_INVSTATUS_VH` |
+| `YCL_AGINGCATEGORY_VH` | `YCL_FI_AGINGCAT_VH` |
+
+Note: SQL view names (`@AbapCatalog.sqlViewName`) were left untouched - they follow a separate,
+shorter convention and were not part of the renamed DDL entity names.
+
+A real bug was caught and fixed during this rename: the `@ObjectModel.query.implementedBy`
+annotation in both value-help custom entities was updated to the new class name, but the ABAP
+class body itself was not automatically updated by the rename - this was manually corrected
+(`ycl_invoicestatus_vh` -> `ycl_fi_invstatus_vh`, same pattern for aging category) to keep the
+annotation and the actual class name in sync. This is the kind of mismatch that would only surface
+as an activation error, not caught by casual review.
+
+**Open item from this pass:** the naming convention doc's "Service Binding" row shows a required
+`_<OData Protocol>` suffix (O2 or O4) that was not added, since the actual protocol choice (OData
+V2 vs V4) has not been decided/confirmed. Confirm before creating the real service binding.
+
+**Also flagged:** the convention document includes rows for Behavior Definition, Behavior Pool,
+Handler Class, and Saver Class - all RAP transactional-BO patterns. This AR Aging report is
+read-only/analytical, so none of these apply unless there's a transactional requirement (e.g.
+manual status override) that hasn't been mentioned. Confirm this report stays read-only.
+
+**Still unresolved (unrelated to this rename):** the `main` branch has 5 commits by a different
+author ("HN") made after this repo's second push, touching the same core files. Those commits
+have not been reviewed, merged, or compared against this work. This rename was applied only to
+the `jayasai-dev-extensibility` branch.

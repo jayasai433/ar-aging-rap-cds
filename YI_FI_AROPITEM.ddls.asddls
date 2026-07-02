@@ -4,7 +4,7 @@
 @AccessControl.authorizationCheck: #CHECK
 @EndUserText.label: 'AR Aging - Customer Open Items (Interface)'
 @VDM.viewType: #BASIC
-define view entity YI_AROPITEM
+define view entity YI_FI_AROPITEM
   as select from I_OperationalAcctgDocCube as Item
 
   // ---- All associations below verified against the person's own published
@@ -35,11 +35,11 @@ define view entity YI_AROPITEM
   association [0..1] to I_WBSElementBasicData                 as _WBSElement
     on $projection.WBSElementInternalID = _WBSElement.WBSElementInternalID
 
-  // Sales Partner Function - routed through YI_ARSALESPARTNER to guarantee a
+  // Sales Partner Function - routed through YI_FI_ARSLSPTNR to guarantee a
   // single deterministic row per document (MIN-based), since the full key
   // set for I_CustSalesPartnerFunc is not joined and multiple partner
   // functions can exist per document.
-  association [0..1] to YI_ARSALESPARTNER                      as _SalesPartnerFunction
+  association [0..1] to YI_FI_ARSLSPTNR                      as _SalesPartnerFunction
     on $projection.AccountingDocument = _SalesPartnerFunction.SalesDocument
 
   // Clearing history - CONFIRMED real, cardinality [0..*], from person's own
@@ -52,8 +52,8 @@ define view entity YI_AROPITEM
     and $projection.AccountingDocumentItem = _ClearingHistory.AccountingDocumentItem
 
   // Clearing aggregate (SUM), built on top of the association above -
-  // see YI_ARCLEARINGAGG for the isolated aggregation logic.
-  association [0..1] to YI_ARCLEARINGAGG                        as _ClearingAgg
+  // see YI_FI_ARCLRAGG for the isolated aggregation logic.
+  association [0..1] to YI_FI_ARCLRAGG                        as _ClearingAgg
     on  $projection.CompanyCode        = _ClearingAgg.CompanyCode
     and $projection.AccountingDocument = _ClearingAgg.AccountingDocument
     and $projection.FiscalYear         = _ClearingAgg.FiscalYear

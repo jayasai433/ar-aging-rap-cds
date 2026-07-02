@@ -5,7 +5,7 @@
     typeNamePlural: 'AR Invoices'
   }
 }
-annotate entity YC_ARAGING with
+annotate entity YC_FI_ARAGING with
 {
   @UI.facet: [
     { id: 'GeneralInfo',  type: #COLLECTION, label: 'General Information', position: 10 },

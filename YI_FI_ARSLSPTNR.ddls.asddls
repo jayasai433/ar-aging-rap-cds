@@ -3,7 +3,7 @@
 @AccessControl.authorizationCheck: #CHECK
 @EndUserText.label: 'AR Aging - Sales Partner Function (Deterministic, Interface)'
 @VDM.viewType: #BASIC
-define view entity YI_ARSALESPARTNER
+define view entity YI_FI_ARSLSPTNR
   as select from I_CustSalesPartnerFunc as Partner
   // NOTE: SalesDocument as the join key to AccountingDocument is carried over
   // from the original spec sheet only - NOT independently verified against

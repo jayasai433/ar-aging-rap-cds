@@ -3,7 +3,7 @@
 @AccessControl.authorizationCheck: #CHECK
 @EndUserText.label: 'AR Aging - Clearing History Aggregate (Interface)'
 @VDM.viewType: #BASIC
-define view entity YI_ARCLEARINGAGG
+define view entity YI_FI_ARCLRAGG
   as select from I_OplAcctgDocItemClrgHist as Clr
   // CONFIRMED real view, cardinality [0..*] from source item - verified
   // against the person's own published Custom CDS View Data Sources list.

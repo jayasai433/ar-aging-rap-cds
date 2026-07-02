@@ -7,9 +7,9 @@
   typeNamePlural: 'AR Invoices',
   title: { type: #STANDARD, value: 'JournalEntry' }
 }
-define root view entity YC_ARAGING
+define root view entity YC_FI_ARAGING
   provider contract transactional_query
-  as projection on YI_ARAGING
+  as projection on YI_FI_ARAGING
 {
   key AccountingDocument,
   key FiscalYear,
@@ -103,7 +103,7 @@ define root view entity YC_ARAGING
       // =========================================================
       @UI.lineItem: [{ position: 140 }]
       @UI.selectionField: [{ position: 50 }]
-      @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_INVOICESTATUS_VH', element: 'InvoiceStatus' } }]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_FI_INVSTATUS_VH', element: 'InvoiceStatus' } }]
       case
         when RemainingAmount = InvoiceAmount or PaidAmount = 0 or PaidAmount is null
           then 'Open'
@@ -120,7 +120,7 @@ define root view entity YC_ARAGING
       AgingDaysInvoice,
 
       @UI.selectionField: [{ position: 60 }]
-      @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_AGINGCATEGORY_VH', element: 'AgingCategory' }, qualifier: 'Invoice' }]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_FI_AGINGCAT_VH', element: 'AgingCategory' }, qualifier: 'Invoice' }]
       case
         when AgingDaysInvoice < 1            then 'Ondue'
         when AgingDaysInvoice between 1   and 30  then '1-30'
@@ -154,7 +154,7 @@ define root view entity YC_ARAGING
       DueDateByBilling,
       AgingDaysBilling,
 
-      @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_AGINGCATEGORY_VH', element: 'AgingCategory' }, qualifier: 'Billing' }]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_FI_AGINGCAT_VH', element: 'AgingCategory' }, qualifier: 'Billing' }]
       case
         when AgingDaysBilling < 1            then 'Ondue'
         when AgingDaysBilling between 1   and 30  then '1-30'

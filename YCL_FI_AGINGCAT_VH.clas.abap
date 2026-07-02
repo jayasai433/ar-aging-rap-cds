@@ -1,4 +1,4 @@
-CLASS ycl_agingcategory_vh DEFINITION
+CLASS ycl_fi_agingcat_vh DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC.
@@ -9,7 +9,7 @@ CLASS ycl_agingcategory_vh DEFINITION
 ENDCLASS.
 
 
-CLASS ycl_agingcategory_vh IMPLEMENTATION.
+CLASS ycl_fi_agingcat_vh IMPLEMENTATION.
 
   METHOD if_rap_query_provider~select.
 
