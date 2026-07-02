@@ -281,3 +281,33 @@ commented-out field, `OriginalReferenceDocument`). Per the person's request, `_C
 has been removed to keep the file clean, since it wasn't feeding anything active into the report.
 If `OriginalReferenceDocument` or another raw field from the standard clearing view is needed
 later, this association would need to be re-added.
+
+## Ninth pass - added missing selection fields (filters)
+
+Compared the full original spec-sheet filter list against what was actually annotated with
+`@UI.selectionField` in `YC_FI_ARAGING` - found 6 present, ~10 missing. Added:
+
+- **BPGroupCode** - selection field + dropdown, now pointing at our recreated `YI_FI_ARBPGROUP`.
+  NOT verified to activate cleanly - that object still has open field-name questions.
+- **CompanyBranch, CustomerBranch, PaymentTermsCode** - selection fields added, NO dropdown (no
+  verified value-help target exists for these).
+- **GLAccount** - selection field + dropdown via `I_GLAccountInChartOfAccounts` - NOT verified
+  released for Developer Extensibility in this system (we already hit one "not released" error on
+  a different standard view, so this is a real risk, not just a formality).
+- **JournalEntry** - selection field, no dropdown (document number, filterable as exact match/text).
+- **SalesName** - selection field, no dropdown (derived from our own deterministic MIN-based view,
+  not a stable master-data value help target).
+- **AgingCategoryBilling** - was missing its selection field entirely; Invoice basis had one, Billing
+  basis didn't. Now both match.
+
+**Deliberately NOT added:** any filter on WBS/Project fields - `I_WBSElementBasicData` is confirmed
+NOT released for Developer Extensibility (see earlier conversation), so adding a filter here would
+be half-working UX at best. Left unfiltered until the WBS access question is resolved (see open
+items: alternative released view via `I_EnterpriseProject`/`I_EnterpriseProjectElement`, per SAP
+KBA 3587487 - not yet confirmed applicable to this scenario).
+
+**Still not addressed:** date-range filtering (Invoice Date, Posting Date, Baseline Date, Actual
+Billing Date, Key Date, Payment Date) - these exist as displayed fields but weren't given selection
+field treatment in this pass, since date-range filters in Fiori Elements typically need different
+UI treatment (range operators) than simple value-help dropdowns, and this wasn't explicitly
+requested. Flag for a follow-up pass if date filtering is required.

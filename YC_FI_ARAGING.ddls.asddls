@@ -25,13 +25,18 @@ define root view entity YC_FI_ARAGING
       CompanyCodeOut,
 
       @UI.lineItem: [{ position: 30 }]
+      @UI.selectionField: [{ position: 21 }]
+      // No verified value-help target for Business Place at this level -
+      // filterable as free text/exact match, no dropdown.
       CompanyBranch,
 
       @UI.lineItem: [{ position: 35 }]
-      // NOTE: value help removed here - I_BusinessPartnerGrouping was never
-      // confirmed as the right target. The person's real system uses their
-      // own custom view YY1_AR_BP_Group for this association instead.
-      // Attach value help to YY1_AR_BP_Group once its own fields are confirmed.
+      @UI.selectionField: [{ position: 25 }]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_FI_ARBPGROUP', element: 'BusinessPartnerGrouping' } }]
+      // Dropdown now points at our recreated YI_FI_ARBPGROUP. I'm not certain
+      // this activates cleanly - YI_FI_ARBPGROUP itself has open questions
+      // (see README) about I_BusinessPartner's exact field names. Verify
+      // this dropdown actually populates before relying on it.
       BPGroupCode,
 
       @UI.lineItem: [{ position: 40 }]
@@ -43,9 +48,17 @@ define root view entity YC_FI_ARAGING
       CustomerName,
 
       @UI.lineItem: [{ position: 42 }]
+      @UI.selectionField: [{ position: 31 }]
+      // No verified value-help target - filterable, no dropdown.
       CustomerBranch,
 
       @UI.lineItem: [{ position: 50 }]
+      @UI.selectionField: [{ position: 45 }]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'I_GLAccountInChartOfAccounts', element: 'GLAccount' } }]
+      // I'm not fully certain I_GLAccountInChartOfAccounts is released for
+      // Developer Extensibility use in your system, given we already hit one
+      // "not released" error on a different standard view (I_WBSElementBasicData).
+      // Verify this activates before trusting the dropdown.
       GLAccount,
 
       @UI.lineItem: [{ position: 51 }]
@@ -56,6 +69,8 @@ define root view entity YC_FI_ARAGING
       DocumentType,
 
       @UI.lineItem: [{ position: 70 }]
+      @UI.selectionField: [{ position: 70 }]
+      // Document number - free-text/exact-match filter, no dropdown by design.
       JournalEntry,
 
       @UI.lineItem: [{ position: 85 }]
@@ -65,12 +80,20 @@ define root view entity YC_FI_ARAGING
       BillingNumber,
 
       @UI.lineItem: [{ position: 100 }]
+      // NOT adding a selection field here - WBSElementInternalID's related
+      // description field (I_WBSElementBasicData) was confirmed NOT released
+      // for Developer Extensibility (see README/conversation). Filtering on
+      // the raw ID alone may still work, but leaving this unfiltered until
+      // that WBS access question is resolved, to avoid half-working UX.
       WBSElementInternalID,
 
       @UI.lineItem: [{ position: 101 }]
       ProjectName,
 
       @UI.lineItem: [{ position: 102 }]
+      @UI.selectionField: [{ position: 90 }]
+      // Derived from our deterministic YI_FI_ARSLSPTNR (MIN-based pick) -
+      // no dropdown, since this isn't a stable master-data value help target.
       SalesName,
 
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
@@ -91,6 +114,9 @@ define root view entity YC_FI_ARAGING
       PostingDate,
       BaselineDate,
       ClearingDate,
+      @UI.selectionField: [{ position: 80 }]
+      // No verified value-help target for payment terms text - filterable,
+      // no dropdown.
       PaymentTermsCode,
       NetPaymentDays,
       KeyDateOut,
@@ -154,6 +180,7 @@ define root view entity YC_FI_ARAGING
       DueDateByBilling,
       AgingDaysBilling,
 
+      @UI.selectionField: [{ position: 61 }]
       @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_FI_AGINGCAT_VH', element: 'AgingCategory' }, qualifier: 'Billing' }]
       case
         when AgingDaysBilling < 1            then 'Ondue'
