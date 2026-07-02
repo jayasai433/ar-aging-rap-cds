@@ -250,3 +250,24 @@ this needs a follow-up fix.
 **Business caveat, carried over from the original spec sheet:** Sales Name may be genuinely NULL
 for FI-direct documents never linked to an SD sales order - this join does not manufacture data
 that was never captured, and that's expected/correct behavior, not a bug.
+
+## Seventh pass - recreated YY1_AR_BP_Group as a clean ADT/DDL object
+
+Per the person's request, `YY1_AR_BP_Group` (originally built in the key-user Custom CDS View app)
+has been recreated as `YI_FI_ARBPGROUP`, a proper ADT/DDL developer-extensibility object, so BP
+Group logic lives in the same git-managed stack as everything else rather than depending on a
+separate key-user object.
+
+**Important limitation, flagged honestly:** this recreation is built ONLY from the 4 fields
+confirmed via the person's ADT screenshot of the key-user view's Elements tab (`Customer`,
+`BusinessPartner`, `BusinessPartnerGrouping` via `_BusinessPartner` association). The key-user
+view's complete field list was never seen, so `YI_FI_ARBPGROUP` is not guaranteed to be a full
+replica - it only covers what's needed for the current `BPGroupCode` use case in this report.
+
+`YI_FI_AROPITEM`'s `_BPGroup` association now points to `YI_FI_ARBPGROUP` instead of
+`YY1_AR_BP_Group`. The join condition itself is unchanged (both `Customer` and `BusinessPartner`
+join to `Item.Customer`, per the person's earlier confirmation).
+
+**Open item:** `YI_FI_ARBPGROUP` has not been activated yet - it needs to be activated before
+`YI_FI_AROPITEM` will resolve correctly, since the association now points to it instead of the
+(already-existing, already-published) key-user object.

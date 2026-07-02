@@ -21,14 +21,13 @@ define view entity YI_FI_AROPITEM
     on  $projection.CompanyCode   = _BusinessPlace.CompanyCode
     and $projection.CompanyBranch = _BusinessPlace.BusinessPlace
 
-  // Custom CDS view - same one already used and published in the person's
-  // key-user build (alias _YY1_AR_BP_Group in their Data Sources list).
-  // Join condition CONFIRMED directly from the person's ADT "Define Join
-  // Conditions" screen: both Customer and BusinessPartner on YY1_AR_BP_Group
-  // are joined to Item.Customer (person confirmed Business Partner = Customer
-  // in their S/4HANA configuration - this is their business-process
-  // confirmation, not something I can independently verify).
-  association [0..1] to YY1_AR_BP_Group                      as _BPGroup
+  // Custom CDS view - RECREATED as YI_FI_ARBPGROUP (proper ADT/DDL object),
+  // replacing the earlier key-user Custom CDS View 'YY1_AR_BP_Group' this was
+  // originally pointed at. Join condition CONFIRMED directly from the person's
+  // ADT "Define Join Conditions" screen for the key-user version: both Customer
+  // and BusinessPartner joined to Item.Customer (person confirmed Business
+  // Partner = Customer in their S/4HANA configuration).
+  association [0..1] to YI_FI_ARBPGROUP                      as _BPGroup
     on  $projection.CustomerCode = _BPGroup.Customer
     and $projection.CustomerCode = _BPGroup.BusinessPartner
 
