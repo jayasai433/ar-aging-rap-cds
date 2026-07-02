@@ -1,25 +1,15 @@
 @Metadata.layer: #CUSTOMER
-@UI: {
-  headerInfo: {
-    typeName: 'AR Invoice',
-    typeNamePlural: 'AR Invoices'
-  }
+@UI.headerInfo: {
+  typeName: 'AR Invoice',
+  typeNamePlural: 'AR Invoices'
 }
+@UI.facet: [
+  { id: 'GeneralInfo',  type: #COLLECTION, label: 'General Information',     position: 10 },
+  { id: 'AgingInvoice', type: #COLLECTION, label: 'Data by Invoice Date',    position: 20 },
+  { id: 'AgingBilling', type: #COLLECTION, label: 'Data by Actual Billing Date', position: 30 }
+]
 annotate entity YC_ARAGING with
 {
-  @UI.facet: [
-    { id: 'GeneralInfo',  type: #COLLECTION, label: 'General Information', position: 10 },
-    { id: 'AgingInvoice', type: #COLLECTION, label: 'Data by Invoice Date', position: 20 },
-    { id: 'AgingBilling', type: #COLLECTION, label: 'Data by Actual Billing Date', position: 30 }
-  ]
-
-  // NOTE: This delivers grouped FACETS in the object page, which is a confirmed,
-  // standard Fiori Elements mechanism. It is NOT the same as a merged/spanning
-  // multi-level COLUMN HEADER in a flat list-report table - that capability is
-  // still unverified (see earlier feasibility note) and would need a separate
-  // check, likely involving freestyle UI5 extension if List Report group headers
-  // don't support it out of the box.
-
   @UI.lineItem: [{ position: 200, groupId: 'AgingInvoice' }]
   AmtInv0130;
 
