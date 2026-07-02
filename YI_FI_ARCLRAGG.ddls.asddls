@@ -16,6 +16,13 @@ define view entity YI_FI_ARCLRAGG
   key Clr.ClearedAccountingDocument,
   key Clr.ClearedAccountingDocumentItem,
 
+      // Currency field required to satisfy the CUKY-reference annotation for
+      // PaidAmount below. ClearingCompanyCodeCurrency assumed to be the correct
+      // pairing based on naming convention matching AmountInCompanyCodeCurrency -
+      // not independently verified beyond that; please confirm visually in ADT.
+      Clr.ClearingCompanyCodeCurrency as PaidAmountCurrency,
+
+      @Semantics.amount.currencyCode: 'PaidAmountCurrency'
       sum( Clr.AmountInCompanyCodeCurrency ) as PaidAmount
 
 }
@@ -29,4 +36,5 @@ group by
   Clr.ClearedCompanyCode,
   Clr.ClearedFiscalYear,
   Clr.ClearedAccountingDocument,
-  Clr.ClearedAccountingDocumentItem
+  Clr.ClearedAccountingDocumentItem,
+  Clr.ClearingCompanyCodeCurrency
