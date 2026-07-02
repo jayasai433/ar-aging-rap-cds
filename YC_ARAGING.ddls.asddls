@@ -2,6 +2,9 @@
 @EndUserText.label: 'AR Aging Report'
 @Metadata.allowExtensions: true
 @Search.searchable: true
+@ObjectModel.usageType.serviceQuality: #A
+@ObjectModel.usageType.sizeCategory: #L
+@ObjectModel.usageType.dataClass: #MIXED
 @UI.headerInfo: {
   typeName: 'AR Invoice',
   typeNamePlural: 'AR Invoices',
@@ -101,12 +104,7 @@ define root view entity YC_ARAGING
       PaymentTermsCode,
       PaymentTermsText,
       KeyDateOut,
-      // "Receipt Date/Payment Date" (your spec column AC) intentionally not exposed yet -
-      // see README, needs your confirmation on whether it equals ClearingDate or is separate.
 
-      // =========================================================
-      // Invoice Status - NULL-safe, fixed-value dropdown
-      // =========================================================
       @UI.lineItem: [{ position: 140 }]
       @UI.selectionField: [{ position: 50 }]
       @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_INVOICESTATUS_VH', element: 'InvoiceStatus' } }]
@@ -118,9 +116,6 @@ define root view entity YC_ARAGING
         else 'Partially Paid'
       end as InvoiceStatus,
 
-      // =========================================================
-      // Invoice Date basis
-      // =========================================================
       DueDateByInvoice,
       EffectiveAgingDate as EffectiveDateInvoice,
       AgingDaysInvoice,
@@ -128,17 +123,16 @@ define root view entity YC_ARAGING
       @UI.selectionField: [{ position: 60 }]
       @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_AGINGCATEGORY_VH', element: 'AgingCategory' }, qualifier: 'Invoice' }]
       case
-        when AgingDaysInvoice < 1            then 'Ondue'
-        when AgingDaysInvoice between 1   and 30  then '1-30'
-        when AgingDaysInvoice between 31  and 60  then '31-60'
-        when AgingDaysInvoice between 61  and 90  then '61-90'
-        when AgingDaysInvoice between 91  and 120 then '91-120'
+        when AgingDaysInvoice < 1                 then 'Ondue'
+        when AgingDaysInvoice between 1 and 30    then '1-30'
+        when AgingDaysInvoice between 31 and 60   then '31-60'
+        when AgingDaysInvoice between 61 and 90   then '61-90'
+        when AgingDaysInvoice between 91 and 120  then '91-120'
         when AgingDaysInvoice between 121 and 180 then '121-180'
         when AgingDaysInvoice between 181 and 365 then '181-365'
         else '>365'
       end as AgingCategoryInvoice,
 
-      // ---- Aging amount buckets, Invoice Date basis ----
       @Semantics.amount.currencyCode: 'TransactionCurrency'
       case when AgingDaysInvoice between 1 and 30 then RemainingAmount else 0 end as AmtInv0130,
       @Semantics.amount.currencyCode: 'TransactionCurrency'
@@ -154,25 +148,21 @@ define root view entity YC_ARAGING
       @Semantics.amount.currencyCode: 'TransactionCurrency'
       case when AgingDaysInvoice > 365 then RemainingAmount else 0 end as AmtInvOver365,
 
-      // =========================================================
-      // Actual Billing Date basis (mirrors Invoice Date basis above)
-      // =========================================================
       DueDateByBilling,
       AgingDaysBilling,
 
       @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_AGINGCATEGORY_VH', element: 'AgingCategory' }, qualifier: 'Billing' }]
       case
-        when AgingDaysBilling < 1            then 'Ondue'
-        when AgingDaysBilling between 1   and 30  then '1-30'
-        when AgingDaysBilling between 31  and 60  then '31-60'
-        when AgingDaysBilling between 61  and 90  then '61-90'
-        when AgingDaysBilling between 91  and 120 then '91-120'
+        when AgingDaysBilling < 1                 then 'Ondue'
+        when AgingDaysBilling between 1 and 30    then '1-30'
+        when AgingDaysBilling between 31 and 60   then '31-60'
+        when AgingDaysBilling between 61 and 90   then '61-90'
+        when AgingDaysBilling between 91 and 120  then '91-120'
         when AgingDaysBilling between 121 and 180 then '121-180'
         when AgingDaysBilling between 181 and 365 then '181-365'
         else '>365'
       end as AgingCategoryBilling,
 
-      // ---- Aging amount buckets, Actual Billing Date basis ----
       @Semantics.amount.currencyCode: 'TransactionCurrency'
       case when AgingDaysBilling between 1 and 30 then RemainingAmount else 0 end as AmtBil0130,
       @Semantics.amount.currencyCode: 'TransactionCurrency'
