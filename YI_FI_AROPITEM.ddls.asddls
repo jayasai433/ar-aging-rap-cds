@@ -99,6 +99,7 @@ define view entity YI_FI_AROPITEM
       // _ClearingHistory._ClearingDocument.OriginalReferenceDocument as OriginalReferenceDocument,
 
       // ---- Amounts (raw, no derived logic at this layer) ----
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       Item.InvoiceAmtInCoCodeCrcy        as InvoiceAmount,             // CONFIRMED, was AmountInTransactionCurrency - wrong before
 
       // ---- Dates / payment terms (raw) ----
