@@ -77,3 +77,79 @@ Still NOT resolved, by design (need your input, not guessed):
   association approach from the key-user tool.
 - `I_OperationalAcctgDocCube` selects from `I_OperationalAcctgDocItem` with no additional filters
   (confirmed directly in ADT) - building straight off Item rather than Cube.
+
+## Third pass - corrected against person's own published Custom CDS View (01.07.2026)
+
+The person shared screenshots of their actual published, working key-user Custom CDS View
+(Data Sources, Elements, and additional Elements tabs). This let several previously "unverified"
+field names get corrected against real, confirmed data - not guesses.
+
+**Confirmed real and now used:**
+- `I_OplAcctgDocItemClrgHist` - the clearing history view genuinely exists, cardinality [0..*].
+  Field used for Paid Amount: `AmountInCompanyCodeCurrency` (was wrongly assumed to be
+  `AmountInTransactionCurrency`).
+- `NetPaymentDays` - DEC(3,0), directly on the item/Cube. The `I_PaymentTerms` association and
+  lookup built in the second pass has been REMOVED - it was unnecessary.
+- `NetDueDate` - DATS(8), directly on the item. CONFIRMED BY THE PERSON DIRECTLY to equal
+  Baseline Date + NetPaymentDays, already computed by SAP. Used as-is for `DueDateByInvoice` -
+  no `DATS_ADD_DAYS` calculation needed for the Invoice basis.
+- `YY1_ActualBillingDate_JEI` - DATS(8), the custom field, reached via
+  `_JournalEntry._JournalEntryItem.YY1_ActualBillingDate_JEI`. This was a placeholder in the
+  second pass and is now wired in for real. The Actual Billing Date aging block now does its
+  own real `DATS_ADD_DAYS(ActualBillingDate, NetPaymentDays)` calculation, since no equivalent
+  pre-computed field exists for this custom basis.
+- `InvoiceAmtInCoCodeCrcy` (was wrongly `AmountInTransactionCurrency`), `CompanyCodeCurrency`
+  (was wrongly `TransactionCurrency`), `_Customer.CustomerName` (was wrongly `CustomerFullName`),
+  `_CustomerCompany.CustomerHeadOffice` (was wrongly `CustomerSupplierClearingAcct`),
+  `GLAccountName` direct on item (association removed), `AccountingDocumentHeaderText` direct
+  on item (header association removed), `_WBSElementBasicData.WBSDescription` (was wrongly
+  `WBSElementBasicDataText`).
+- Primary data source corrected to `I_OperationalAcctgDocCube`, matching the person's actual
+  published view, rather than `I_OperationalAcctgDocItem` directly.
+
+**Changed / removed:**
+- BP Group now associates to the person's own custom view `YY1_AR_BP_Group` (already published
+  and used in their key-user build) instead of the standard `I_BusinessPartnerGrouping` - the
+  latter was never confirmed to be the right target. `YY1_AR_BP_Group`'s own field list has not
+  been seen, so only `BusinessPartnerGrouping` (the join key) is used for now; BP Group Name is
+  not yet exposed pending confirmation of that view's fields.
+- Invoice Date (header-level) removed - was based on an unconfirmed `_AccountingDocumentHeader`
+  association that the person's real view does not use. Not reinstated until a real need and a
+  confirmed field are established.
+- Invoice Reference (`DocumentReferenceID`) removed - not seen anywhere in the person's real
+  Elements list; may not exist as named, or may require a different path. Needs re-investigation
+  if this field is actually required.
+- Payment Terms text (readable label) removed - was based on the now-removed `I_PaymentTerms`
+  association. `PaymentTermsCode` (raw code) is still exposed.
+
+**Still open, unchanged from before:**
+- DSO - still not implemented, still a scope question.
+- Receipt Date / Payment Date (spec sheet column AC) - still not mapped, still unclear if it
+  equals `ClearingDate` or is separate.
+- `YY1_AR_BP_Group`'s own fields (beyond the join key) are unseen - if BP Group Name or other
+  attributes are needed, that view's Elements list needs to be shared too.
+- The 14 aging amount bucket columns and both Aging Category columns are now genuinely correct
+  for both bases, since `DueDateByBilling` no longer silently duplicates the Invoice basis - this
+  was flagged as a known placeholder bug in the second pass and is now fixed.
+
+**Still NOT verified, flagged honestly:**
+- I have not seen `I_JournalEntry` / `_JournalEntryItem`'s full field list beyond the one custom
+  field confirmed in the screenshot - the association path is inferred from the alias shown
+  (`_JournalEntry._JournalEntryItem.YY1_ActualBillingDate_JEI`) and may need adjustment if the
+  actual association structure differs.
+- Sales Name / Partner Function fan-out risk - CONFIRMED by the person that `I_CustSalesPartnerFunc`
+  is real, but its full key set is not joined (deliberately, to avoid needing every key field), which
+  means multiple partner function rows can exist per document. Fixed by routing through a new
+  isolated view, `YI_ARSALESPARTNER`, which uses `MIN(PartnerFunction) GROUP BY SalesDocument` to
+  deterministically pick one row every time - avoiding both fan-out (duplicate report rows) and
+  non-deterministic results from unordered SQL. The join key `SalesDocument = AccountingDocument`
+  is still carried over from the original spec sheet only, NOT independently verified against this
+  view's real key structure - confirm in ADT before activation.
+- `_BPGroup` association join CORRECTED - confirmed directly from the person's ADT "Define Join
+  Conditions" screen that `YY1_AR_BP_Group` (technical name `AR_BP_Grouping`, built on
+  `I_BusinessPartnerCustomer`) joins on both `Customer` and `BusinessPartner`, both equal to
+  `Item.Customer` (person confirmed Business Partner = Customer in their S/4HANA configuration).
+  The earlier version had a circular join condition (joining on `BusinessPartnerGrouping`, a field
+  that is itself sourced FROM this association) - now fixed to join on `Customer`/`BusinessPartner`
+  instead, which are confirmed real keys on the associated view.
+

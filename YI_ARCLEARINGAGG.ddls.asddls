@@ -5,6 +5,8 @@
 @VDM.viewType: #BASIC
 define view entity YI_ARCLEARINGAGG
   as select from I_OplAcctgDocItemClrgHist as Clr
+  // CONFIRMED real view, cardinality [0..*] from source item - verified
+  // against the person's own published Custom CDS View Data Sources list.
 
 {
   key Clr.CompanyCode,
@@ -12,10 +14,9 @@ define view entity YI_ARCLEARINGAGG
   key Clr.AccountingDocument,
   key Clr.AccountingDocumentItem,
 
-      // Sum of cleared/paid amounts across all clearing line items
-      // belonging to this invoice item. Kept as the ONLY aggregate
-      // expression in the stack - nothing downstream re-aggregates it.
-      sum(Clr.AmountInTransactionCurrency) as PaidAmount
+      // CONFIRMED field name - AmountInCompanyCodeCurrency, was
+      // AmountInTransactionCurrency in the earlier unverified draft.
+      sum(Clr.AmountInCompanyCodeCurrency) as PaidAmount
 
 }
 group by

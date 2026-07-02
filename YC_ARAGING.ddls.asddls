@@ -24,18 +24,15 @@ define root view entity YC_ARAGING
       @UI.selectionField: [{ position: 20 }]
       CompanyCodeOut,
 
-      @UI.lineItem: [{ position: 21 }]
-      CompanyName,
-
       @UI.lineItem: [{ position: 30 }]
       CompanyBranch,
 
       @UI.lineItem: [{ position: 35 }]
-      @Consumption.valueHelpDefinition: [{ entity: { name: 'I_BusinessPartnerGrouping', element: 'BusinessPartnerGrouping' } }]
+      // NOTE: value help removed here - I_BusinessPartnerGrouping was never
+      // confirmed as the right target. The person's real system uses their
+      // own custom view YY1_AR_BP_Group for this association instead.
+      // Attach value help to YY1_AR_BP_Group once its own fields are confirmed.
       BPGroupCode,
-
-      @UI.lineItem: [{ position: 36 }]
-      BPGroupName,
 
       @UI.lineItem: [{ position: 40 }]
       @UI.selectionField: [{ position: 30 }]
@@ -61,9 +58,6 @@ define root view entity YC_ARAGING
       @UI.lineItem: [{ position: 70 }]
       JournalEntry,
 
-      @UI.lineItem: [{ position: 80 }]
-      InvoiceReference,
-
       @UI.lineItem: [{ position: 85 }]
       InvoiceDescription,
 
@@ -79,30 +73,30 @@ define root view entity YC_ARAGING
       @UI.lineItem: [{ position: 102 }]
       SalesName,
 
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       @UI.lineItem: [{ position: 110 }]
       InvoiceAmount,
 
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       @UI.lineItem: [{ position: 120 }]
       PaidAmount,
 
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       @UI.lineItem: [{ position: 130 }]
       RemainingAmount,
 
       @Semantics.currencyCode: true
-      TransactionCurrency,
+      CompanyCodeCurrency,
 
-      InvoiceDate,
       PostingDate,
       BaselineDate,
       ClearingDate,
       PaymentTermsCode,
-      PaymentTermsText,
+      NetPaymentDays,
       KeyDateOut,
-      // "Receipt Date/Payment Date" (your spec column AC) intentionally not exposed yet -
-      // see README, needs your confirmation on whether it equals ClearingDate or is separate.
+      ActualBillingDate,
+      // "Receipt Date/Payment Date" (spec column AC) intentionally not exposed yet -
+      // see README, still needs confirmation on whether it equals ClearingDate or is separate.
 
       // =========================================================
       // Invoice Status - NULL-safe, fixed-value dropdown
@@ -139,23 +133,23 @@ define root view entity YC_ARAGING
       end as AgingCategoryInvoice,
 
       // ---- Aging amount buckets, Invoice Date basis ----
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       case when AgingDaysInvoice between 1 and 30 then RemainingAmount else 0 end as AmtInv0130,
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       case when AgingDaysInvoice between 31 and 60 then RemainingAmount else 0 end as AmtInv3160,
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       case when AgingDaysInvoice between 61 and 90 then RemainingAmount else 0 end as AmtInv6190,
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       case when AgingDaysInvoice between 91 and 120 then RemainingAmount else 0 end as AmtInv91120,
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       case when AgingDaysInvoice between 121 and 180 then RemainingAmount else 0 end as AmtInv121180,
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       case when AgingDaysInvoice between 181 and 365 then RemainingAmount else 0 end as AmtInv181365,
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       case when AgingDaysInvoice > 365 then RemainingAmount else 0 end as AmtInvOver365,
 
       // =========================================================
-      // Actual Billing Date basis (mirrors Invoice Date basis above)
+      // Actual Billing Date basis
       // =========================================================
       DueDateByBilling,
       AgingDaysBilling,
@@ -173,26 +167,25 @@ define root view entity YC_ARAGING
       end as AgingCategoryBilling,
 
       // ---- Aging amount buckets, Actual Billing Date basis ----
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       case when AgingDaysBilling between 1 and 30 then RemainingAmount else 0 end as AmtBil0130,
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       case when AgingDaysBilling between 31 and 60 then RemainingAmount else 0 end as AmtBil3160,
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       case when AgingDaysBilling between 61 and 90 then RemainingAmount else 0 end as AmtBil6190,
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       case when AgingDaysBilling between 91 and 120 then RemainingAmount else 0 end as AmtBil91120,
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       case when AgingDaysBilling between 121 and 180 then RemainingAmount else 0 end as AmtBil121180,
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       case when AgingDaysBilling between 181 and 365 then RemainingAmount else 0 end as AmtBil181365,
-      @Semantics.amount.currencyCode: 'TransactionCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       case when AgingDaysBilling > 365 then RemainingAmount else 0 end as AmtBilOver365,
 
       _Customer,
       _CustomerCompany,
       _BusinessPlace,
-      _GLAccountText,
+      _BPGroup,
       _WBSElement,
-      _SalesPartnerFunction,
-      _PaymentTerms
+      _SalesPartnerFunction
 }

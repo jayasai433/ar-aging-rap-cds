@@ -5,50 +5,66 @@
 @EndUserText.label: 'AR Aging - Customer Open Items (Interface)'
 @VDM.viewType: #BASIC
 define view entity YI_AROPITEM
-  as select from I_OperationalAcctgDocItem as Item
+  as select from I_OperationalAcctgDocCube as Item
 
-  association [0..1] to I_Customer                        as _Customer
+  // ---- All associations below verified against the person's own published
+  // Custom CDS View (Data Sources / Elements screenshots, confirmed 01.07.2026) ----
+
+  association [0..1] to I_Customer                          as _Customer
     on $projection.CustomerCode = _Customer.Customer
 
-  association [0..1] to I_CustomerCompany                  as _CustomerCompany
+  association [0..1] to I_CustomerCompany                    as _CustomerCompany
     on  $projection.CustomerCode = _CustomerCompany.Customer
     and $projection.CompanyCode  = _CustomerCompany.CompanyCode
 
-  association [0..1] to I_BusinessPlace                    as _BusinessPlace
+  association [0..1] to I_BusinessPlace                      as _BusinessPlace
     on  $projection.CompanyCode   = _BusinessPlace.CompanyCode
     and $projection.CompanyBranch = _BusinessPlace.BusinessPlace
 
-  association [0..1] to I_GLAccountTextInCompanyCode        as _GLAccountText
-    on  $projection.CompanyCode = _GLAccountText.CompanyCode
-    and $projection.GLAccount   = _GLAccountText.GLAccount
+  // Custom CDS view - same one already used and published in the person's
+  // key-user build (alias _YY1_AR_BP_Group in their Data Sources list).
+  // Join condition CONFIRMED directly from the person's ADT "Define Join
+  // Conditions" screen: both Customer and BusinessPartner on YY1_AR_BP_Group
+  // are joined to Item.Customer (person confirmed Business Partner = Customer
+  // in their S/4HANA configuration - this is their business-process
+  // confirmation, not something I can independently verify).
+  association [0..1] to YY1_AR_BP_Group                      as _BPGroup
+    on  $projection.CustomerCode = _BPGroup.Customer
+    and $projection.CustomerCode = _BPGroup.BusinessPartner
 
-  association [0..1] to I_WBSElementBasicData                as _WBSElement
+  association [0..1] to I_WBSElementBasicData                 as _WBSElement
     on $projection.WBSElementInternalID = _WBSElement.WBSElementInternalID
 
-  association [0..1] to I_CustSalesPartnerFunc                as _SalesPartnerFunction
+  // Sales Partner Function - routed through YI_ARSALESPARTNER to guarantee a
+  // single deterministic row per document (MIN-based), since the full key
+  // set for I_CustSalesPartnerFunc is not joined and multiple partner
+  // functions can exist per document.
+  association [0..1] to YI_ARSALESPARTNER                      as _SalesPartnerFunction
     on $projection.AccountingDocument = _SalesPartnerFunction.SalesDocument
 
-  // Header-level source - needed for Invoice Date (distinct from item-level Posting Date)
-  // and Invoice Description (header text), per your spec sheet columns O/Y.
-  association [0..1] to I_AccountingDocument                   as _AccountingDocumentHeader
-    on  $projection.CompanyCode        = _AccountingDocumentHeader.CompanyCode
-    and $projection.FiscalYear         = _AccountingDocumentHeader.FiscalYear
-    and $projection.AccountingDocument = _AccountingDocumentHeader.AccountingDocument
+  // Clearing history - CONFIRMED real, cardinality [0..*], from person's own
+  // published Data Sources list. Fields confirmed: AmountInCompanyCodeCurrency,
+  // ClearingCompanyCodeCurrency.
+  association [0..*] to I_OplAcctgDocItemClrgHist               as _ClearingHistory
+    on  $projection.CompanyCode        = _ClearingHistory.CompanyCode
+    and $projection.AccountingDocument = _ClearingHistory.AccountingDocument
+    and $projection.FiscalYear         = _ClearingHistory.FiscalYear
+    and $projection.AccountingDocumentItem = _ClearingHistory.AccountingDocumentItem
 
-  // BP Group - association unverified: BusinessPartnerGrouping field/key needs confirming
-  // against I_Customer or I_BusinessPartner in your system before activation.
-  association [0..1] to I_BusinessPartnerGrouping               as _BPGroup
-    on $projection.BPGroupCode = _BPGroup.BusinessPartnerGrouping
-
-  association [0..1] to I_CompanyCode                           as _CompanyCodeText
-    on $projection.CompanyCode = _CompanyCodeText.CompanyCode
-
-  // Clearing aggregate, joined to bring Paid Amount onto the item
-  association [0..1] to YI_ARCLEARINGAGG                     as _ClearingAgg
+  // Clearing aggregate (SUM), built on top of the association above -
+  // see YI_ARCLEARINGAGG for the isolated aggregation logic.
+  association [0..1] to YI_ARCLEARINGAGG                        as _ClearingAgg
     on  $projection.CompanyCode        = _ClearingAgg.CompanyCode
     and $projection.AccountingDocument = _ClearingAgg.AccountingDocument
     and $projection.FiscalYear         = _ClearingAgg.FiscalYear
     and $projection.AccountingDocumentItem = _ClearingAgg.AccountingDocumentItem
+
+  // Journal Entry Item - confirmed real, this is how the custom Actual Billing
+  // Date field is reached: _JournalEntry._JournalEntryItem.YY1_ActualBillingDate_JEI
+  association [0..1] to I_JournalEntry                          as _JournalEntry
+    on  $projection.CompanyCode        = _JournalEntry.CompanyCode
+    and $projection.FiscalYear         = _JournalEntry.FiscalYear
+    and $projection.AccountingDocument = _JournalEntry.AccountingDocument
 
 {
       // ---- Keys ----
@@ -58,59 +74,58 @@ define view entity YI_AROPITEM
   key Item.CompanyCode,
 
       // ---- Org / partner dimensions ----
-      Item.FiscalYear           as FiscalYearNum,         // FIS_GJAHR_NO_CONV
-      Item.CompanyCode          as CompanyCode,           // FIS_BUKRS
-      _CompanyCodeText.CompanyCodeName as CompanyName,     // text for Company Code - field name unverified
-      Item.BusinessPlace        as CompanyBranch,         // J_1BBRANC_ via I_BusinessPlace assoc key
-      Item.Customer             as CustomerCode,          // KUNNR
-      _Customer.CustomerFullName as CustomerName,          // MD_CUSTOMER_FULL_NAME
-      _CustomerCompany.CustomerSupplierClearingAcct as CustomerBranch, // KNRZE - field name unverified, confirm in ADT
-      _BPGroup.BusinessPartnerGrouping as BPGroupCode,      // BU_GROUP - association source unverified
-      _BPGroup.BusinessPartnerGroupingName as BPGroupName,
-      Item.GLAccount            as GLAccount,             // FIS_RACCT
-      _GLAccountText.GLAccountName as GLAccountName,        // FIN_GLACCOUNT_NAME
-      Item.AccountingDocumentType as DocumentType,        // FARP_BLART
-      Item.AccountingDocument   as JournalEntry,           // document number
-      Item.DocumentReferenceID  as InvoiceReference,       // FIS_AWKEY
-      Item.BillingDocument      as BillingNumber,          // VBELN_VF
-      _AccountingDocumentHeader.DocumentHeaderText as InvoiceDescription, // BKTXT - field name unverified
-      Item.WBSElementInternalID as WBSElementInternalID,   // FIS_WBSINT_NO_CONV
-      _WBSElement.WBSElementBasicDataText as ProjectName,   // PS_S4_POST1 - confirm field name in ADT
-      _SalesPartnerFunction.PartnerFunction as SalesName,   // PARVW - your spec notes this is SD-only, NULL for FI-direct docs
+      Item.FiscalYear                    as FiscalYearNum,
+      Item.CompanyCode                   as CompanyCode,
+      Item.CompanyCodeCurrency           as CompanyCodeCurrency,       // CONFIRMED, replaces earlier TransactionCurrency guess
+      Item.BusinessPlace                 as CompanyBranch,
+      _BPGroup.BusinessPartnerGrouping   as BPGroupCode,
+      // BPGroupName not yet confirmed on YY1_AR_BP_Group - left out until
+      // the person confirms that view's own field list.
+      Item.Customer                      as CustomerCode,
+      _Customer.CustomerName             as CustomerName,              // CONFIRMED alias, was CustomerFullName - wrong before
+      _CustomerCompany.CustomerHeadOffice as CustomerBranch,           // CONFIRMED, was CustomerSupplierClearingAcct - wrong before
+      Item.GLAccount                     as GLAccount,
+      Item.GLAccountName                 as GLAccountName,             // CONFIRMED direct field, association removed
+      Item._AccountingDocumentType.AccountingDocumentType as DocumentType, // CONFIRMED path via association per screenshot
+      Item.AccountingDocument            as JournalEntry,
+      Item.BillingDocument               as BillingNumber,             // CONFIRMED direct field
+      Item.AccountingDocumentHeaderText  as InvoiceDescription,        // CONFIRMED direct field, header association removed
+      Item.WBSElementInternalID          as WBSElementInternalID,
+      _WBSElement.WBSDescription         as ProjectName,               // CONFIRMED alias, was WBSElementBasicDataText - wrong before
+      _SalesPartnerFunction.PartnerFunction as SalesName,
+
+      // Original reference document - confirmed present, reached via
+      // clearing history association's own _ClearingDocument association.
+      // Kept here for visibility though it is clearing-side, not item-side.
+      // _ClearingHistory._ClearingDocument.OriginalReferenceDocument as OriginalReferenceDocument,
 
       // ---- Amounts (raw, no derived logic at this layer) ----
-      Item.AmountInTransactionCurrency as InvoiceAmount,    // FIS_HSL - local currency amount
-      Item.TransactionCurrency         as TransactionCurrency,
+      Item.InvoiceAmtInCoCodeCrcy        as InvoiceAmount,             // CONFIRMED, was AmountInTransactionCurrency - wrong before
 
       // ---- Dates / payment terms (raw) ----
-      _AccountingDocumentHeader.DocumentDate as InvoiceDate, // header-level FIS_BUDAT - distinct from item PostingDate below
-      Item.PostingDate                 as PostingDate,      // item-level FIS_BUDAT
-      Item.NetDueDate                  as BaselineDate,     // FIS_DZFBDT - confirm exact field at build time
-      Item.PaymentTerms                as PaymentTermsCode, // FARP_DZTERM
-      Item.ClearingDate                as ClearingDate,     // FIS_AUGDT
-      // "Receipt Date/Payment Date" from your spec sheet (column AC) is NOT mapped here -
-      // unclear whether this is identical to ClearingDate or a distinct field. Confirm
-      // before this column is treated as final.
+      Item.PostingDate                   as PostingDate,
+      Item.DueCalculationBaseDate        as BaselineDate,              // CONFIRMED field exists; confirm semantics if used for display
+      Item.NetDueDate                    as DueDateByInvoice,          // CONFIRMED = Baseline Date + NetPaymentDays, verified by the person directly
+      Item.NetPaymentDays                as NetPaymentDays,            // CONFIRMED direct field, no I_PaymentTerms lookup needed
+      Item.PaymentTerms                  as PaymentTermsCode,
+      Item.ClearingDate                  as ClearingDate,
 
-      // Custom field - actual physical invoice submission date.
-      // NOTE: only include this once confirmed visible in the extension include
-      // of I_OperationalAcctgDocItem in ADT - placeholder name below.
-      // Item.YY1_ActualBillingDate    as ActualBillingDate,
+      // Custom field - CONFIRMED real and reachable via Journal Entry Item association
+      _JournalEntry._JournalEntryItem.YY1_ActualBillingDate_JEI as ActualBillingDate,
 
       // ---- Filter discriminator kept visible for transparency ----
-      Item.FinancialAccountType        as FinancialAccountType,
+      Item.FinancialAccountType          as FinancialAccountType,
 
       // ---- Associations exposed ----
       _Customer,
       _CustomerCompany,
       _BusinessPlace,
-      _GLAccountText,
+      _BPGroup,
       _WBSElement,
       _SalesPartnerFunction,
-      _AccountingDocumentHeader,
-      _BPGroup,
-      _CompanyCodeText,
-      _ClearingAgg
+      _ClearingHistory,
+      _ClearingAgg,
+      _JournalEntry
 }
 where
   Item.FinancialAccountType = 'D'
