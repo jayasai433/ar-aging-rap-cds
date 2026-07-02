@@ -35,12 +35,11 @@ define view entity YI_FI_AROPITEM
   association [0..1] to I_WBSElementBasicData                 as _WBSElement
     on $projection.WBSElementInternalID = _WBSElement.WBSElementInternalID
 
-  // Sales Partner Function - routed through YI_FI_ARSLSPTNR to guarantee a
-  // single deterministic row per document (MIN-based), since the full key
-  // set for I_CustSalesPartnerFunc is not joined and multiple partner
-  // functions can exist per document.
+  // Sales Partner Function - routed through YI_FI_ARSLSPTNR, joined on Customer
+  // only (Sales Area unavailable at this level, see YI_FI_ARSLSPTNR header
+  // comment for the full explanation of this correction).
   association [0..1] to YI_FI_ARSLSPTNR                      as _SalesPartnerFunction
-    on $projection.AccountingDocument = _SalesPartnerFunction.SalesDocument
+    on $projection.CustomerCode = _SalesPartnerFunction.Customer
 
   // Clearing history - CONFIRMED real, cardinality [0..*], from person's own
   // published Data Sources list. Fields confirmed: AmountInCompanyCodeCurrency,

@@ -220,3 +220,33 @@ NOTE (per userPreferences on this account): field names above are read from a ph
 person's ADT screen, not independently verified by me against SAP documentation or a live system.
 Small-text misreadings are possible - the person should visually confirm each field name against
 their own screen before activating, especially before relying on this for a production transport.
+
+## Sixth pass - major correction to Sales Partner Function (YI_FI_ARSLSPTNR)
+
+The person shared a real ADT screenshot of `I_CustSalesPartnerFunc`'s actual key structure, which
+revealed the earlier draft was not just missing verified field names but structurally WRONG:
+
+- **Earlier (wrong) assumption:** the view was keyed by `SalesDocument`, joined to
+  `AccountingDocument`, aggregated with `MIN(PartnerFunction) GROUP BY SalesDocument`.
+- **Real structure (confirmed by screenshot):** keys are `Customer`, `SalesOrganization`,
+  `DistributionChannel`, `Division`, `PartnerCounter`, `PartnerFunction` - this is Sales Area
+  partner-function MASTER DATA (Customer x Sales Area x Partner Function), not document-level data
+  at all. No `SalesDocument` field exists on this view.
+- Confirmed by grep that `YI_FI_AROPITEM` has no Sales Area fields (`SalesOrganization`,
+  `DistributionChannel`, `Division` do not exist on `I_OperationalAcctgDocCube`/Item) - consistent
+  with FI-direct postings not carrying SD-specific Sales Area data.
+
+**Fix applied, per the person's explicit instruction:** join on `Customer` only, ignoring Sales
+Area (since it's unavailable at the FI-document level), and deterministically pick one
+`PartnerFunction` per customer via `MIN()`.
+
+**Known limitation of this fix, flagged honestly:** `MIN(PartnerFunction)` picks the
+alphabetically-lowest partner function CODE, not necessarily the row with the lowest
+`PartnerCounter` (SAP's own literal "first assigned" sequence). A true counter-based "first" would
+need a correlated subquery or window function - not attempted, to avoid unverified activation risk
+on a fourth structural change to this object. If exact counter-based ordering is required later,
+this needs a follow-up fix.
+
+**Business caveat, carried over from the original spec sheet:** Sales Name may be genuinely NULL
+for FI-direct documents never linked to an SD sales order - this join does not manufacture data
+that was never captured, and that's expected/correct behavior, not a bug.
