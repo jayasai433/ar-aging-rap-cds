@@ -43,14 +43,11 @@ define view entity YI_FI_AROPITEM
   // Clearing history - CONFIRMED real, cardinality [0..*], from person's own
   // published Data Sources list. Fields confirmed: AmountInCompanyCodeCurrency,
   // ClearingCompanyCodeCurrency.
-  association [0..*] to I_OplAcctgDocItemClrgHist               as _ClearingHistory
-    on  $projection.CompanyCode        = _ClearingHistory.ClearedCompanyCode
-    and $projection.AccountingDocument = _ClearingHistory.ClearedAccountingDocument
-    and $projection.FiscalYear         = _ClearingHistory.ClearedFiscalYear
-    and $projection.AccountingDocumentItem = _ClearingHistory.ClearedAccountingDocumentItem
-
-  // Clearing aggregate (SUM), built on top of the association above -
-  // see YI_FI_ARCLRAGG for the isolated aggregation logic.
+  // Clearing aggregate (SUM), built on our custom YI_FI_ARCLRAGG, which itself
+  // selects from the standard I_OplAcctgDocItemClrgHist and aggregates it.
+  // This is the only clearing-related association actually used by the report.
+  // (A separate direct association straight to I_OplAcctgDocItemClrgHist was
+  // removed here - it was unused except for one commented-out field.)
   association [0..1] to YI_FI_ARCLRAGG                        as _ClearingAgg
     on  $projection.CompanyCode        = _ClearingAgg.ClearedCompanyCode
     and $projection.AccountingDocument = _ClearingAgg.ClearedAccountingDocument
@@ -92,11 +89,6 @@ define view entity YI_FI_AROPITEM
       _WBSElement.WBSDescription         as ProjectName,               // CONFIRMED alias, was WBSElementBasicDataText - wrong before
       _SalesPartnerFunction.PartnerFunction as SalesName,
 
-      // Original reference document - confirmed present, reached via
-      // clearing history association's own _ClearingDocument association.
-      // Kept here for visibility though it is clearing-side, not item-side.
-      // _ClearingHistory._ClearingDocument.OriginalReferenceDocument as OriginalReferenceDocument,
-
       // ---- Amounts (raw, no derived logic at this layer) ----
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       Item.InvoiceAmtInCoCodeCrcy        as InvoiceAmount,             // CONFIRMED, was AmountInTransactionCurrency - wrong before
@@ -122,7 +114,6 @@ define view entity YI_FI_AROPITEM
       _BPGroup,
       _WBSElement,
       _SalesPartnerFunction,
-      _ClearingHistory,
       _ClearingAgg,
       _JournalEntry
 }

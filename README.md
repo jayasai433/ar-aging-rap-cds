@@ -271,3 +271,13 @@ join to `Item.Customer`, per the person's earlier confirmation).
 **Open item:** `YI_FI_ARBPGROUP` has not been activated yet - it needs to be activated before
 `YI_FI_AROPITEM` will resolve correctly, since the association now points to it instead of the
 (already-existing, already-published) key-user object.
+
+## Eighth pass - removed unused _ClearingHistory association
+
+`YI_FI_AROPITEM` had two clearing-related associations: `_ClearingAgg` (to our custom
+`YI_FI_ARCLRAGG`, actively used for PaidAmount) and `_ClearingHistory` (a separate direct
+association straight to the standard `I_OplAcctgDocItemClrgHist`, used only for one
+commented-out field, `OriginalReferenceDocument`). Per the person's request, `_ClearingHistory`
+has been removed to keep the file clean, since it wasn't feeding anything active into the report.
+If `OriginalReferenceDocument` or another raw field from the standard clearing view is needed
+later, this association would need to be re-added.
