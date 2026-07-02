@@ -1,26 +1,29 @@
 @AbapCatalog.sqlViewName: 'YIARCLRAGG'
 @AbapCatalog.compiler.compareFilter: true
-@AccessControl.authorizationCheck: #CHECK
-@EndUserText.label: 'AR Aging - Clearing History Aggregate (Interface)'
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'AR Aging - Clearing History Aggregate'
 @VDM.viewType: #BASIC
 define view entity YI_FI_ARCLRAGG
   as select from I_OplAcctgDocItemClrgHist as Clr
-  // CONFIRMED real view, cardinality [0..*] from source item - verified
-  // against the person's own published Custom CDS View Data Sources list.
+  // Field names below CONFIRMED from the person's real ADT screen (photo,
+  // 2026-07-03). Grouping is on the "Cleared*" fields, which point back to
+  // the ORIGINAL invoice item being paid off - not the "Clearing*" fields,
+  // which describe the clearing document itself. This was a real bug in the
+  // earlier draft, which incorrectly grouped by CompanyCode/AccountingDocument/
+  // FiscalYear/AccountingDocumentItem - none of which exist under those exact
+  // names on this view.
 
 {
-  key Clr.CompanyCode,
-  key Clr.FiscalYear,
-  key Clr.AccountingDocument,
-  key Clr.AccountingDocumentItem,
+  key Clr.ClearedCompanyCode,
+  key Clr.ClearedFiscalYear,
+  key Clr.ClearedAccountingDocument,
+  key Clr.ClearedAccountingDocumentItem,
 
-      // CONFIRMED field name - AmountInCompanyCodeCurrency, was
-      // AmountInTransactionCurrency in the earlier unverified draft.
-      sum(Clr.AmountInCompanyCodeCurrency) as PaidAmount
+      sum( Clr.AmountInCompanyCodeCurrency ) as PaidAmount
 
 }
 group by
-  Clr.CompanyCode,
-  Clr.FiscalYear,
-  Clr.AccountingDocument,
-  Clr.AccountingDocumentItem
+  Clr.ClearedCompanyCode,
+  Clr.ClearedFiscalYear,
+  Clr.ClearedAccountingDocument,
+  Clr.ClearedAccountingDocumentItem

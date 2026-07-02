@@ -196,3 +196,27 @@ manual status override) that hasn't been mentioned. Confirm this report stays re
 author ("HN") made after this repo's second push, touching the same core files. Those commits
 have not been reviewed, merged, or compared against this work. This rename was applied only to
 the `jayasai-dev-extensibility` branch.
+
+## Fifth pass - real field names confirmed from ADT screenshot for YI_FI_ARCLRAGG
+
+The person shared a photo of their actual ADT editor showing `I_OplAcctgDocItemClrgHist`'s real
+field list (2026-07-03). This caught a real bug that would have failed at activation:
+
+- The clearing history view's key fields that point back to the ORIGINAL invoice item are
+  `ClearedCompanyCode`, `ClearedFiscalYear`, `ClearedAccountingDocument`,
+  `ClearedAccountingDocumentItem` - NOT `CompanyCode`/`FiscalYear`/`AccountingDocument`/
+  `AccountingDocumentItem` as the earlier draft assumed. The `Clearing*` prefixed fields
+  (`ClearingCompanyCode`, `ClearingFiscalYear`, etc.) describe the CLEARING DOCUMENT itself,
+  a different thing entirely.
+- `YI_FI_ARCLRAGG` now groups by the correct `Cleared*` fields.
+- Both `_ClearingHistory` and `_ClearingAgg` associations in `YI_FI_AROPITEM` updated to join on
+  these corrected field names.
+- `AmountInCompanyCodeCurrency` (used in the SUM) was already correct in the earlier draft - no
+  change needed there.
+- `@AccessControl.authorizationCheck: #NOT_REQUIRED` confirmed matching the person's real object
+  (was `#CHECK` in the earlier draft - corrected to match).
+
+NOTE (per userPreferences on this account): field names above are read from a photo of the
+person's ADT screen, not independently verified by me against SAP documentation or a live system.
+Small-text misreadings are possible - the person should visually confirm each field name against
+their own screen before activating, especially before relying on this for a production transport.

@@ -46,18 +46,18 @@ define view entity YI_FI_AROPITEM
   // published Data Sources list. Fields confirmed: AmountInCompanyCodeCurrency,
   // ClearingCompanyCodeCurrency.
   association [0..*] to I_OplAcctgDocItemClrgHist               as _ClearingHistory
-    on  $projection.CompanyCode        = _ClearingHistory.CompanyCode
-    and $projection.AccountingDocument = _ClearingHistory.AccountingDocument
-    and $projection.FiscalYear         = _ClearingHistory.FiscalYear
-    and $projection.AccountingDocumentItem = _ClearingHistory.AccountingDocumentItem
+    on  $projection.CompanyCode        = _ClearingHistory.ClearedCompanyCode
+    and $projection.AccountingDocument = _ClearingHistory.ClearedAccountingDocument
+    and $projection.FiscalYear         = _ClearingHistory.ClearedFiscalYear
+    and $projection.AccountingDocumentItem = _ClearingHistory.ClearedAccountingDocumentItem
 
   // Clearing aggregate (SUM), built on top of the association above -
   // see YI_FI_ARCLRAGG for the isolated aggregation logic.
   association [0..1] to YI_FI_ARCLRAGG                        as _ClearingAgg
-    on  $projection.CompanyCode        = _ClearingAgg.CompanyCode
-    and $projection.AccountingDocument = _ClearingAgg.AccountingDocument
-    and $projection.FiscalYear         = _ClearingAgg.FiscalYear
-    and $projection.AccountingDocumentItem = _ClearingAgg.AccountingDocumentItem
+    on  $projection.CompanyCode        = _ClearingAgg.ClearedCompanyCode
+    and $projection.AccountingDocument = _ClearingAgg.ClearedAccountingDocument
+    and $projection.FiscalYear         = _ClearingAgg.ClearedFiscalYear
+    and $projection.AccountingDocumentItem = _ClearingAgg.ClearedAccountingDocumentItem
 
   // Journal Entry Item - confirmed real, this is how the custom Actual Billing
   // Date field is reached: _JournalEntry._JournalEntryItem.YY1_ActualBillingDate_JEI
