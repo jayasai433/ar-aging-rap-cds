@@ -311,3 +311,13 @@ Billing Date, Key Date, Payment Date) - these exist as displayed fields but were
 field treatment in this pass, since date-range filters in Fiori Elements typically need different
 UI treatment (range operators) than simple value-help dropdowns, and this wasn't explicitly
 requested. Flag for a follow-up pass if date filtering is required.
+
+## Tenth pass - restricted dropdowns to Invoice Status and Aging Category only
+
+Per explicit instruction, removed `@Consumption.valueHelpDefinition` from `BPGroupCode`,
+`GLAccount`, and `CustomerCode` - all three still remain as plain `@UI.selectionField` filters
+(filterable via free text/exact match), just without a dropdown. Only `InvoiceStatus`,
+`AgingCategoryInvoice`, and `AgingCategoryBilling` now have value help dropdowns - all three point
+at our own custom, controlled objects (`YI_FI_INVSTATUS_VH`, `YI_FI_AGINGCAT_VH`), avoiding any
+dependency on standard views whose Developer Extensibility release state we haven't verified
+(relevant after the `I_WBSElementBasicData` "not released" error encountered earlier).

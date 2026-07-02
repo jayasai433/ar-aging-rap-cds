@@ -32,16 +32,15 @@ define root view entity YC_FI_ARAGING
 
       @UI.lineItem: [{ position: 35 }]
       @UI.selectionField: [{ position: 25 }]
-      @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_FI_ARBPGROUP', element: 'BusinessPartnerGrouping' } }]
-      // Dropdown now points at our recreated YI_FI_ARBPGROUP. I'm not certain
-      // this activates cleanly - YI_FI_ARBPGROUP itself has open questions
-      // (see README) about I_BusinessPartner's exact field names. Verify
-      // this dropdown actually populates before relying on it.
+      // Dropdown removed per instruction - only Invoice Status and Aging
+      // Category should have value help dropdowns. Filterable as exact
+      // match/text, no dropdown.
       BPGroupCode,
 
       @UI.lineItem: [{ position: 40 }]
       @UI.selectionField: [{ position: 30 }]
-      @Consumption.valueHelpDefinition: [{ entity: { name: 'I_Customer', element: 'Customer' } }]
+      // Dropdown removed per instruction - only Invoice Status and Aging
+      // Category should have value help dropdowns.
       CustomerCode,
 
       @UI.lineItem: [{ position: 41 }]
@@ -54,11 +53,9 @@ define root view entity YC_FI_ARAGING
 
       @UI.lineItem: [{ position: 50 }]
       @UI.selectionField: [{ position: 45 }]
-      @Consumption.valueHelpDefinition: [{ entity: { name: 'I_GLAccountInChartOfAccounts', element: 'GLAccount' } }]
-      // I'm not fully certain I_GLAccountInChartOfAccounts is released for
-      // Developer Extensibility use in your system, given we already hit one
-      // "not released" error on a different standard view (I_WBSElementBasicData).
-      // Verify this activates before trusting the dropdown.
+      // Dropdown removed per instruction - only Invoice Status and Aging
+      // Category should have value help dropdowns. Filterable as exact
+      // match/text, no dropdown.
       GLAccount,
 
       @UI.lineItem: [{ position: 51 }]
