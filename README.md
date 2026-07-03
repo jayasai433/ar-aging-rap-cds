@@ -577,3 +577,22 @@ an intentional rename on the person's side; not something I can explain, only co
   names for the framework to map values correctly).
 - `yc_fi_araging.ddls.asddls` - both `@Consumption.valueHelpDefinition` references (Invoice and
   Billing qualifiers) updated from `element: 'AgingCategory'` to `element: 'InvoiceDateStatus'`.
+
+## Twenty-third pass - fixed F4 dialog vs dropdown rendering for Invoice Status
+
+Real issue: Invoice Status was rendering as a full F4 search-help dialog instead of an inline
+dropdown. Found via direct comparison: `YI_FI_AGINGCAT_VH` (confirmed working/correct per the
+person's live screenshot) has `@ObjectModel.resultSet.sizeCategory: #XS`, but our repo's
+`YI_FI_INVSTATUS_VH` was missing this annotation entirely. This matches a pattern found earlier
+in this conversation (a real SAP community blog example) where this annotation is specifically
+what causes Fiori Elements to render small, fixed value-help results as an inline dropdown rather
+than a popup dialog.
+
+**Fixed:** added `@ObjectModel.resultSet.sizeCategory: #XS` to `yi_fi_invstatus_vh.ddls.asddls`.
+
+**Flagged, not fixed (uncertain, needs the person's confirmation):** re-examining an earlier
+screenshot, the `@ObjectModel.query.implementedBy` on the person's live `YI_FI_AGINGCAT_VH` may
+have shown a class name that doesn't match `YCL_FI_AGINGCAT_VH` (possibly `YCL_FI_INVDATESTATUS_VH`
+or similar) - I'm not fully confident in this reading given image quality, and did not change
+anything based on it. Worth the person double-checking directly in ADT whether the `AgingCat`
+custom entity's `implementedBy` class reference is actually correct in their live system.
