@@ -533,3 +533,23 @@ definition to already exist and be activated first.
 **Earlier unverified/guessed `yc_fi_araging.ddlx.xml`** (created on the isolated
 `abapgit-ddlx-test` branch) is now superseded by this confirmed-schema version on the main dev
 branch.
+
+## Twenty-first pass - two real activation errors fixed
+
+**Error 1 (confirmed via SAP's own official error message documentation, message class
+ESH_ENG_CDSVAL_SRCH):** "At least one element has to be set as 'defaultSearchElement'" -
+`@Search.searchable: true` requires at least one field annotated with
+`@Search.defaultSearchElement: true`. Fixed by adding this annotation to `JournalEntry` (the
+document number, a sensible free-text search target).
+
+**Error 2 (confirmed via multiple real SAP examples - SAP-samples openSAP course, SAP PRESS blog,
+independent community blogs):** "Annotation 'UI.lineItem.groupId' unknown" - `groupId` is not a
+valid property of `@UI.lineItem`. This was a real design mistake, not a syntax typo - I used the
+wrong annotation entirely for grouping fields into object-page facets. The correct mechanism is
+`@UI.fieldGroup` with a `qualifier`, paired with a facet of `type: #FIELDGROUP_REFERENCE` and a
+matching `targetQualifier` - completely rewrote `yc_fi_araging.ddlx.asddlxs` to use this pattern
+instead of the invalid `groupId` property.
+
+Confirmed the 14 aging bucket fields have no `@UI.lineItem` in the main consumption view either,
+so they were never intended to appear as columns in the flat list report - only grouped in the
+object page facets, consistent with the corrected `@UI.fieldGroup`-only approach.

@@ -77,7 +77,11 @@ define root view entity YC_FI_ARAGING
 
       @UI.lineItem: [{ position: 70 }]
       @UI.selectionField: [{ position: 70 }]
+      @Search.defaultSearchElement: true
       // Document number - free-text/exact-match filter, no dropdown by design.
+      // @Search.defaultSearchElement added to satisfy the required-for-searchable-
+      // view constraint (confirmed real SAP error ESH_ENG_CDSVAL_SRCH001/006:
+      // "At least one element has to be set as 'defaultSearchElement'").
       JournalEntry,
 
       @UI.lineItem: [{ position: 85 }]

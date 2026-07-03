@@ -7,10 +7,17 @@
 }
 annotate entity YC_FI_ARAGING with
 {
+  // CORRECTED (2026-07-03): "groupId" is not a valid property of @UI.lineItem -
+  // confirmed real ADT error "Annotation 'UI.lineItem.groupId' unknown". The
+  // correct mechanism to route fields into separate object-page facets is
+  // @UI.fieldGroup with a qualifier, paired with a facet of
+  // type: #FIELDGROUP_REFERENCE and a matching targetQualifier - NOT a
+  // property on @UI.lineItem itself. Confirmed via multiple real SAP examples
+  // (SAP-samples openSAP course, SAP PRESS blog, community blogs).
   @UI.facet: [
     { id: 'GeneralInfo',  type: #COLLECTION, label: 'General Information', position: 10 },
-    { id: 'AgingInvoice', type: #COLLECTION, label: 'Data by Invoice Date', position: 20 },
-    { id: 'AgingBilling', type: #COLLECTION, label: 'Data by Actual Billing Date', position: 30 }
+    { id: 'AgingInvoiceFacet', type: #FIELDGROUP_REFERENCE, label: 'Data by Invoice Date', position: 20, targetQualifier: 'AgingInvoiceGroup' },
+    { id: 'AgingBillingFacet', type: #FIELDGROUP_REFERENCE, label: 'Data by Actual Billing Date', position: 30, targetQualifier: 'AgingBillingGroup' }
   ]
 
   // NOTE: This delivers grouped FACETS in the object page, which is a confirmed,
@@ -20,45 +27,45 @@ annotate entity YC_FI_ARAGING with
   // check, likely involving freestyle UI5 extension if List Report group headers
   // don't support it out of the box.
 
-  @UI.lineItem: [{ position: 200, groupId: 'AgingInvoice' }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInvoiceGroup', position: 200 }]
   AmtInv0130;
 
-  @UI.lineItem: [{ position: 201, groupId: 'AgingInvoice' }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInvoiceGroup', position: 201 }]
   AmtInv3160;
 
-  @UI.lineItem: [{ position: 202, groupId: 'AgingInvoice' }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInvoiceGroup', position: 202 }]
   AmtInv6190;
 
-  @UI.lineItem: [{ position: 203, groupId: 'AgingInvoice' }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInvoiceGroup', position: 203 }]
   AmtInv91120;
 
-  @UI.lineItem: [{ position: 204, groupId: 'AgingInvoice' }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInvoiceGroup', position: 204 }]
   AmtInv121180;
 
-  @UI.lineItem: [{ position: 205, groupId: 'AgingInvoice' }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInvoiceGroup', position: 205 }]
   AmtInv181365;
 
-  @UI.lineItem: [{ position: 206, groupId: 'AgingInvoice' }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInvoiceGroup', position: 206 }]
   AmtInvOver365;
 
-  @UI.lineItem: [{ position: 210, groupId: 'AgingBilling' }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBillingGroup', position: 210 }]
   AmtBil0130;
 
-  @UI.lineItem: [{ position: 211, groupId: 'AgingBilling' }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBillingGroup', position: 211 }]
   AmtBil3160;
 
-  @UI.lineItem: [{ position: 212, groupId: 'AgingBilling' }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBillingGroup', position: 212 }]
   AmtBil6190;
 
-  @UI.lineItem: [{ position: 213, groupId: 'AgingBilling' }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBillingGroup', position: 213 }]
   AmtBil91120;
 
-  @UI.lineItem: [{ position: 214, groupId: 'AgingBilling' }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBillingGroup', position: 214 }]
   AmtBil121180;
 
-  @UI.lineItem: [{ position: 215, groupId: 'AgingBilling' }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBillingGroup', position: 215 }]
   AmtBil181365;
 
-  @UI.lineItem: [{ position: 216, groupId: 'AgingBilling' }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBillingGroup', position: 216 }]
   AmtBilOver365;
 }
