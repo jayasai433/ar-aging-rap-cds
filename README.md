@@ -378,3 +378,21 @@ Precision `(23, 2)` used based on the confirmed field type shown in the person's
 screenshot of `InvoiceAmtInCoCodeCrcy CURR(23,2)` / `AmountInCompanyCodeCurrency CURR(23,2)` - not
 guessed, but also not independently re-verified at the point of this fix; worth a quick sanity
 check if activation still complains about precision specifically.
+
+## Fourteenth pass - fixed missing currency reference annotations (propagation gap)
+
+New real activation error in `YI_FI_ARAGING`: "YI_FI_ARAGING-INVOICEAMOUNT reference information
+missing or data type wrong, see long text." Root cause, confirmed by inspection: `@Semantics.amount.currencyCode`
+annotations do not automatically propagate through projection layers - even though `InvoiceAmount`
+had this annotation correctly set in `YI_FI_AROPITEM`, `YI_FI_ARAGING` (which selects from that
+view) needed the annotation restated explicitly for its own field list, since CDS treats it as a
+new view with its own semantic requirements.
+
+I'm not stating this propagation behavior as a documented, KBA-confirmed fact this time - it's my
+best inference from the error message and the fix that resolved it, not independently verified
+against SAP documentation the way the CURR arithmetic error (KBA 3392907) was.
+
+**Fixed:** added `@Semantics.amount.currencyCode: 'CompanyCodeCurrency'` to `InvoiceAmount`,
+`PaidAmount`, and `RemainingAmount` in both `YI_FI_ARAGING` and `YC_FI_ARAGING` (6 additions total).
+The 14 aging bucket columns in `YC_FI_ARAGING` already had this annotation from the original build
+- confirmed via grep, no changes needed there.

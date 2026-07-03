@@ -33,15 +33,18 @@ define view entity YI_FI_ARAGING
       Item.ProjectName,
       Item.SalesName,
 
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       Item.InvoiceAmount,
       Item.CompanyCodeCurrency,
       Item.PaymentTermsCode,
       Item.NetPaymentDays,
 
       // Paid Amount surfaced from the isolated aggregate - flat column
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       coalesce( Item._ClearingAgg.PaidAmount, cast( 0 as abap.curr( 23, 2 ) ) ) as PaidAmount,
 
       // Remaining Amount - single arithmetic expression, no nested aggregate
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       Item.InvoiceAmount - coalesce( Item._ClearingAgg.PaidAmount, cast( 0 as abap.curr( 23, 2 ) ) ) as RemainingAmount,
 
       Item.PostingDate,

@@ -94,13 +94,16 @@ define root view entity YC_FI_ARAGING
       SalesName,
 
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       @UI.lineItem: [{ position: 110 }]
       InvoiceAmount,
 
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       @UI.lineItem: [{ position: 120 }]
       PaidAmount,
 
+      @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
       @UI.lineItem: [{ position: 130 }]
       RemainingAmount,
