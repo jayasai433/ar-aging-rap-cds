@@ -321,3 +321,27 @@ Per explicit instruction, removed `@Consumption.valueHelpDefinition` from `BPGro
 at our own custom, controlled objects (`YI_FI_INVSTATUS_VH`, `YI_FI_AGINGCAT_VH`), avoiding any
 dependency on standard views whose Developer Extensibility release state we haven't verified
 (relevant after the `I_WBSElementBasicData` "not released" error encountered earlier).
+
+## abapGit pull setup - eleventh pass
+
+Successfully validated the abapGit pull pattern on an isolated single-object test
+(`abapgit-single-object-test` branch, `YI_FI_ARCLRAGG`). Two things were required, confirmed via
+real ADT import log errors, not guessed:
+
+1. **Lowercase filenames** - abapGit requires all filenames lowercase (`yi_fi_arclragg.ddls.asddls`,
+   not `YI_FI_ARCLRAGG.ddls.asddls`). This was documented in abapGit's own docs, but missed on the
+   first attempt - confirmed as the actual blocker via the real "File not found: yi_fi_arclragg.ddls.xml"
+   error message.
+2. **Per-object metadata XML** (`.ddls.xml`), plus root-level `.abapgit.xml`.
+
+**Applied to this branch:** all 8 DDLS objects now have lowercase source files + metadata XML,
+following the confirmed-working pattern. All non-DDLS source files (2 CLAS, 1 DDLX, 1 SRVD) have
+been renamed lowercase too, but **do NOT yet have metadata XML** - I do not have verified example
+schemas for those three object types (only fragments of abapGit's internal deserializer code, not
+complete confirmed examples). Pulling right now would likely fail the same "file not found" way for
+those 4 objects specifically.
+
+**Recommended next step:** test pull with just the 8 DDLS objects first (the CLAS/DDLX/SRVD source
+files can be temporarily excluded or ignored via abapGit's ignore-list), since those are now
+following a validated pattern. Then tackle DDLX/CLAS/SRVD metadata format via the same
+isolated-single-object-test approach that worked for DDLS, rather than guessing at the schema.
