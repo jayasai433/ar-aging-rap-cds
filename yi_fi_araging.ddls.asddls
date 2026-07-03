@@ -105,66 +105,66 @@ define view entity YI_FI_ARAGING
       // only references them as plain passthrough fields.
 
       case
-        when RemainingAmount = InvoiceAmount or PaidAmount = cast( 0 as abap.curr( 23, 2 ) )
+        when $projection.RemainingAmount = Item.InvoiceAmount or $projection.PaidAmount = cast( 0 as abap.curr( 23, 2 ) )
           then 'Open'
-        when RemainingAmount = cast( 0 as abap.curr( 23, 2 ) )
+        when $projection.RemainingAmount = cast( 0 as abap.curr( 23, 2 ) )
           then 'Cleared'
         else 'Partially Paid'
       end as InvoiceStatus,
 
       case
-        when AgingDaysInvoice < 1                 then 'Ondue'
-        when AgingDaysInvoice between 1   and 30  then '1-30'
-        when AgingDaysInvoice between 31  and 60  then '31-60'
-        when AgingDaysInvoice between 61  and 90  then '61-90'
-        when AgingDaysInvoice between 91  and 120 then '91-120'
-        when AgingDaysInvoice between 121 and 180 then '121-180'
-        when AgingDaysInvoice between 181 and 365 then '181-365'
+        when $projection.AgingDaysInvoice < 1                 then 'Ondue'
+        when $projection.AgingDaysInvoice between 1   and 30  then '1-30'
+        when $projection.AgingDaysInvoice between 31  and 60  then '31-60'
+        when $projection.AgingDaysInvoice between 61  and 90  then '61-90'
+        when $projection.AgingDaysInvoice between 91  and 120 then '91-120'
+        when $projection.AgingDaysInvoice between 121 and 180 then '121-180'
+        when $projection.AgingDaysInvoice between 181 and 365 then '181-365'
         else '>365'
       end as AgingCategoryInvoice,
 
       case
-        when AgingDaysBilling < 1                 then 'Ondue'
-        when AgingDaysBilling between 1   and 30  then '1-30'
-        when AgingDaysBilling between 31  and 60  then '31-60'
-        when AgingDaysBilling between 61  and 90  then '61-90'
-        when AgingDaysBilling between 91  and 120 then '91-120'
-        when AgingDaysBilling between 121 and 180 then '121-180'
-        when AgingDaysBilling between 181 and 365 then '181-365'
+        when $projection.AgingDaysBilling < 1                 then 'Ondue'
+        when $projection.AgingDaysBilling between 1   and 30  then '1-30'
+        when $projection.AgingDaysBilling between 31  and 60  then '31-60'
+        when $projection.AgingDaysBilling between 61  and 90  then '61-90'
+        when $projection.AgingDaysBilling between 91  and 120 then '91-120'
+        when $projection.AgingDaysBilling between 121 and 180 then '121-180'
+        when $projection.AgingDaysBilling between 181 and 365 then '181-365'
         else '>365'
       end as AgingCategoryBilling,
 
       // ---- Aging amount buckets, Invoice Date basis ----
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 1 and 30 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv0130,
+      case when $projection.AgingDaysInvoice between 1 and 30 then $projection.RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv0130,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 31 and 60 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv3160,
+      case when $projection.AgingDaysInvoice between 31 and 60 then $projection.RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv3160,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 61 and 90 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv6190,
+      case when $projection.AgingDaysInvoice between 61 and 90 then $projection.RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv6190,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 91 and 120 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv91120,
+      case when $projection.AgingDaysInvoice between 91 and 120 then $projection.RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv91120,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 121 and 180 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv121180,
+      case when $projection.AgingDaysInvoice between 121 and 180 then $projection.RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv121180,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 181 and 365 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv181365,
+      case when $projection.AgingDaysInvoice between 181 and 365 then $projection.RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv181365,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice > 365 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInvOver365,
+      case when $projection.AgingDaysInvoice > 365 then $projection.RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInvOver365,
 
       // ---- Aging amount buckets, Actual Billing Date basis ----
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 1 and 30 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil0130,
+      case when $projection.AgingDaysBilling between 1 and 30 then $projection.RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil0130,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 31 and 60 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil3160,
+      case when $projection.AgingDaysBilling between 31 and 60 then $projection.RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil3160,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 61 and 90 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil6190,
+      case when $projection.AgingDaysBilling between 61 and 90 then $projection.RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil6190,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 91 and 120 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil91120,
+      case when $projection.AgingDaysBilling between 91 and 120 then $projection.RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil91120,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 121 and 180 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil121180,
+      case when $projection.AgingDaysBilling between 121 and 180 then $projection.RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil121180,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 181 and 365 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil181365,
+      case when $projection.AgingDaysBilling between 181 and 365 then $projection.RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil181365,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling > 365 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBilOver365,
+      case when $projection.AgingDaysBilling > 365 then $projection.RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBilOver365,
 
       Item._Customer,
       Item._CustomerCompany,

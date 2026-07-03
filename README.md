@@ -455,3 +455,23 @@ catching wrong assumptions.
 
 This was a substantial structural fix, not a small annotation tweak - worth a full re-activation
 test of both `YI_FI_ARAGING` and `YC_FI_ARAGING` from scratch.
+
+## Eighteenth pass - fixed same-list alias references with $projection prefix
+
+Real ADT errors: "The column RemainingAmount is unknown", "The column PaidAmount is unknown",
+"The column AgingDaysInvoice is unknown" - appearing everywhere these aliases were referenced
+later in the same SELECT list of `YI_FI_ARAGING`.
+
+Root cause: bare alias references (e.g. `RemainingAmount`) don't work for this purpose - the
+correct syntax requires the `$projection.` prefix (e.g. `$projection.RemainingAmount`). I had
+found a real SAP sample confirming same-list alias references are valid CDS syntax, but missed
+that the sample used the `$projection.` prefix explicitly - I incorrectly generalized "you can
+reference a previous alias" to mean bare names work, when the sample actually showed
+`$projection.kilometers`, not bare `kilometers`.
+
+**Fixed:** every reference to `RemainingAmount`, `PaidAmount`, `AgingDaysInvoice`, and
+`AgingDaysBilling` used inside an expression (not the `as X` declaration itself) now uses the
+`$projection.` prefix - 30 occurrences fixed via scripted replacement, then manually verified no
+bare references remain. One additional fix: a bare `InvoiceAmount` reference (inside the
+InvoiceStatus CASE) was changed to the unambiguous `Item.InvoiceAmount` form instead, avoiding
+the same-list-alias mechanism entirely for that one reference.
