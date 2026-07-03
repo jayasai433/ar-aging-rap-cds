@@ -9,7 +9,10 @@
 }
 define root view entity YC_FI_ARAGING
   provider contract transactional_query
-  as projection on YI_FI_ARAGING
+  with parameters
+    @Environment.systemField: #SYSTEM_DATE
+    P_KeyDate : abap.dats
+  as projection on YI_FI_ARAGING( P_KeyDate: $parameters.P_KeyDate )
 {
   key AccountingDocument,
   key FiscalYear,

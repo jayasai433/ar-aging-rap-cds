@@ -396,3 +396,18 @@ against SAP documentation the way the CURR arithmetic error (KBA 3392907) was.
 `PaidAmount`, and `RemainingAmount` in both `YI_FI_ARAGING` and `YC_FI_ARAGING` (6 additions total).
 The 14 aging bucket columns in `YC_FI_ARAGING` already had this annotation from the original build
 - confirmed via grep, no changes needed there.
+
+## Fifteenth pass - added missing parameter declaration to YC_FI_ARAGING
+
+Real gap found: `YC_FI_ARAGING` (`as projection on YI_FI_ARAGING`) never declared or passed through
+the `P_KeyDate` parameter that `YI_FI_ARAGING` requires. CDS parameters do not automatically
+propagate through a projection view - the consuming view must explicitly redeclare the parameter
+and pass it down via `YI_FI_ARAGING( P_KeyDate: $parameters.P_KeyDate )` in the FROM clause.
+
+Fixed: added `with parameters @Environment.systemField: #SYSTEM_DATE P_KeyDate : abap.dats` to
+`YC_FI_ARAGING`, same default-to-system-date behavior as the source view, and passed it through
+explicitly in the projection clause.
+
+This is standard, well-established CDS parameter mechanics, not something uncertain the way some
+of the other fixes in this log have been - but it hadn't been tested against real activation until
+now, so worth confirming it resolves cleanly.
