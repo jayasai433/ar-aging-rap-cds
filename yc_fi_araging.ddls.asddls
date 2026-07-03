@@ -157,19 +157,19 @@ define root view entity YC_FI_ARAGING
 
       // ---- Aging amount buckets, Invoice Date basis ----
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 1 and 30 then RemainingAmount else 0 end as AmtInv0130,
+      case when AgingDaysInvoice between 1 and 30 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv0130,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 31 and 60 then RemainingAmount else 0 end as AmtInv3160,
+      case when AgingDaysInvoice between 31 and 60 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv3160,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 61 and 90 then RemainingAmount else 0 end as AmtInv6190,
+      case when AgingDaysInvoice between 61 and 90 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv6190,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 91 and 120 then RemainingAmount else 0 end as AmtInv91120,
+      case when AgingDaysInvoice between 91 and 120 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv91120,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 121 and 180 then RemainingAmount else 0 end as AmtInv121180,
+      case when AgingDaysInvoice between 121 and 180 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv121180,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 181 and 365 then RemainingAmount else 0 end as AmtInv181365,
+      case when AgingDaysInvoice between 181 and 365 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv181365,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice > 365 then RemainingAmount else 0 end as AmtInvOver365,
+      case when AgingDaysInvoice > 365 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInvOver365,
 
       // =========================================================
       // Actual Billing Date basis
@@ -192,19 +192,19 @@ define root view entity YC_FI_ARAGING
 
       // ---- Aging amount buckets, Actual Billing Date basis ----
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 1 and 30 then RemainingAmount else 0 end as AmtBil0130,
+      case when AgingDaysBilling between 1 and 30 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil0130,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 31 and 60 then RemainingAmount else 0 end as AmtBil3160,
+      case when AgingDaysBilling between 31 and 60 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil3160,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 61 and 90 then RemainingAmount else 0 end as AmtBil6190,
+      case when AgingDaysBilling between 61 and 90 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil6190,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 91 and 120 then RemainingAmount else 0 end as AmtBil91120,
+      case when AgingDaysBilling between 91 and 120 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil91120,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 121 and 180 then RemainingAmount else 0 end as AmtBil121180,
+      case when AgingDaysBilling between 121 and 180 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil121180,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 181 and 365 then RemainingAmount else 0 end as AmtBil181365,
+      case when AgingDaysBilling between 181 and 365 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil181365,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling > 365 then RemainingAmount else 0 end as AmtBilOver365,
+      case when AgingDaysBilling > 365 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBilOver365,
 
       _Customer,
       _CustomerCompany,

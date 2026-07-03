@@ -39,10 +39,10 @@ define view entity YI_FI_ARAGING
       Item.NetPaymentDays,
 
       // Paid Amount surfaced from the isolated aggregate - flat column
-      coalesce( Item._ClearingAgg.PaidAmount, 0 ) as PaidAmount,
+      coalesce( Item._ClearingAgg.PaidAmount, cast( 0 as abap.curr( 23, 2 ) ) ) as PaidAmount,
 
       // Remaining Amount - single arithmetic expression, no nested aggregate
-      Item.InvoiceAmount - coalesce( Item._ClearingAgg.PaidAmount, 0 ) as RemainingAmount,
+      Item.InvoiceAmount - coalesce( Item._ClearingAgg.PaidAmount, cast( 0 as abap.curr( 23, 2 ) ) ) as RemainingAmount,
 
       Item.PostingDate,
       Item.BaselineDate,
@@ -53,7 +53,7 @@ define view entity YI_FI_ARAGING
 
       // ---- Effective "as-of" date: frozen at clearing date once fully paid ----
       case
-        when ( Item.InvoiceAmount - coalesce( Item._ClearingAgg.PaidAmount, 0 ) ) = 0
+        when ( Item.InvoiceAmount - coalesce( Item._ClearingAgg.PaidAmount, cast( 0 as abap.curr( 23, 2 ) ) ) ) = 0
           then coalesce( Item.ClearingDate, $parameters.P_KeyDate )
         else $parameters.P_KeyDate
       end as EffectiveAgingDate,
@@ -71,7 +71,7 @@ define view entity YI_FI_ARAGING
       dats_days_between(
         Item.DueDateByInvoice,
         case
-          when ( Item.InvoiceAmount - coalesce( Item._ClearingAgg.PaidAmount, 0 ) ) = 0
+          when ( Item.InvoiceAmount - coalesce( Item._ClearingAgg.PaidAmount, cast( 0 as abap.curr( 23, 2 ) ) ) ) = 0
             then coalesce( Item.ClearingDate, $parameters.P_KeyDate )
           else $parameters.P_KeyDate
         end
@@ -81,7 +81,7 @@ define view entity YI_FI_ARAGING
       dats_days_between(
         dats_add_days( Item.ActualBillingDate, cast( Item.NetPaymentDays as abap.int4 ), 'INITIAL' ),
         case
-          when ( Item.InvoiceAmount - coalesce( Item._ClearingAgg.PaidAmount, 0 ) ) = 0
+          when ( Item.InvoiceAmount - coalesce( Item._ClearingAgg.PaidAmount, cast( 0 as abap.curr( 23, 2 ) ) ) ) = 0
             then coalesce( Item.ClearingDate, $parameters.P_KeyDate )
           else $parameters.P_KeyDate
         end

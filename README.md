@@ -359,3 +359,22 @@ this confirmed structure (CLSNAME, LANGU, DESCRIPT, STATE=1, CLSCCINCL=X, FIXPT=
 **Still missing:** DDLX (metadata extension) and SRVD (service definition) metadata XML - no
 verified example found for either yet. These two object types remain the last gap before the full
 repo is abapGit-pullable.
+
+## Thirteenth pass - fixed CURR arithmetic error (confirmed via official SAP KBA)
+
+Real activation error: "Data type CURR is not supported at this position, see long text" in
+`YI_FI_ARAGING`. Found and confirmed via official SAP KBA 3392907 (S/4HANA Cloud Public Edition) -
+exact match to our situation. Root cause: an element of type CURR requires a decimal shift/cast
+before being used in expressions like CASE or COALESCE; a bare literal `0` mixed with a CURR field
+in these contexts is not type-compatible and must be explicitly cast.
+
+**Fixed 19 occurrences total:**
+- 5 in `YI_FI_ARAGING`: every `coalesce( Item._ClearingAgg.PaidAmount, 0 )` changed to
+  `coalesce( Item._ClearingAgg.PaidAmount, cast( 0 as abap.curr( 23, 2 ) ) )`.
+- 14 in `YC_FI_ARAGING`: every aging bucket `CASE WHEN ... THEN RemainingAmount ELSE 0 END` changed
+  to `... ELSE cast( 0 as abap.curr( 23, 2 ) ) END`.
+
+Precision `(23, 2)` used based on the confirmed field type shown in the person's own earlier
+screenshot of `InvoiceAmtInCoCodeCrcy CURR(23,2)` / `AmountInCompanyCodeCurrency CURR(23,2)` - not
+guessed, but also not independently re-verified at the point of this fix; worth a quick sanity
+check if activation still complains about precision specifically.
