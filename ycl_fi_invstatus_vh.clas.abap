@@ -26,6 +26,10 @@ CLASS ycl_fi_invstatus_vh IMPLEMENTATION.
       ( invoicestatus = 'Cleared'         invoicestatustext = 'Cleared' )
     ).
 
+    " FIXED: io_response is a separate SELECT method parameter, not reached
+    " via io_request->get_response() - that method does not exist on
+    " if_rap_query_request. Confirmed against SAP's own official ADT tutorial
+    " (developers.sap.com) and multiple independent real examples.
     " Fixed value list - paging/sorting are accepted but not meaningfully
     " applicable to a 3-row static set. Calls below are still made to avoid
     " the "GET_SORT_ELEMENTS / GET_PAGING not called" backend error reported
@@ -34,9 +38,9 @@ CLASS ycl_fi_invstatus_vh IMPLEMENTATION.
       io_request->get_paging( ).
       io_request->get_sort_elements( ).
 
-      io_request->get_response( )->set_total_number_of_records(
+      io_response->set_total_number_of_records(
         value = lines( lt_data ) ).
-      io_request->get_response( )->set_data( lt_data ).
+      io_response->set_data( lt_data ).
     ENDIF.
 
   ENDMETHOD.

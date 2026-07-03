@@ -34,13 +34,17 @@ CLASS ycl_fi_agingcat_vh IMPLEMENTATION.
       ( agingcategory = '>365'     agingcategorytext = 'Over 365 Days' )
     ).
 
+    " FIXED: io_response is a separate SELECT method parameter, not reached
+    " via io_request->get_response() - that method does not exist on
+    " if_rap_query_request. Confirmed against SAP's own official ADT tutorial
+    " (developers.sap.com) and multiple independent real examples.
     IF io_request->is_data_requested( ).
       io_request->get_paging( ).
       io_request->get_sort_elements( ).
 
-      io_request->get_response( )->set_total_number_of_records(
+      io_response->set_total_number_of_records(
         value = lines( lt_data ) ).
-      io_request->get_response( )->set_data( lt_data ).
+      io_response->set_data( lt_data ).
     ENDIF.
 
   ENDMETHOD.

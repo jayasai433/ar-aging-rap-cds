@@ -411,3 +411,20 @@ explicitly in the projection clause.
 This is standard, well-established CDS parameter mechanics, not something uncertain the way some
 of the other fixes in this log have been - but it hadn't been tested against real activation until
 now, so worth confirming it resolves cleanly.
+
+## Sixteenth pass - fixed real bug in both value-help provider classes
+
+Real ADT error: "Method 'GET_RESPONSE' is unknown or PROTECTED or PRIVATE" in
+`ycl_fi_invstatus_vh` (and the identical bug existed in `ycl_fi_agingcat_vh` too, caught by
+inspection once the first one was confirmed).
+
+This was a genuine implementation bug I introduced originally, not a SAP quirk. The
+`IF_RAP_QUERY_PROVIDER~SELECT` method signature has `io_request` AND `io_response` as two
+SEPARATE parameters - `io_response` is never reached via `io_request->get_response()`, which
+does not exist as a method at all. Confirmed with high confidence across many independent real
+sources, including SAP's own official ADT tutorial (developers.sap.com/tutorials, "Implement a
+Custom Entity and API Execution (Query Implementation) Class") and several unrelated blog examples,
+all consistently showing `io_response->set_data(...)` called directly, never through `io_request`.
+
+**Fixed:** both classes now call `io_response->set_total_number_of_records(...)` and
+`io_response->set_data(...)` directly, removing the incorrect `io_request->get_response()` chain.
