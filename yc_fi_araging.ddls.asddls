@@ -158,7 +158,7 @@ define root view entity YC_FI_ARAGING
 
       // Calculation moved to YI_FI_ARAGING - see note above.
       @UI.selectionField: [{ position: 60 }]
-      @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_FI_AGINGCAT_VH', element: 'AgingCategory' }, qualifier: 'Invoice' }]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_FI_AGINGCAT_VH', element: 'InvoiceDateStatus' }, qualifier: 'Invoice' }]
       AgingCategoryInvoice,
 
       // ---- Aging amount buckets, Invoice Date basis ----
@@ -188,7 +188,7 @@ define root view entity YC_FI_ARAGING
 
       // Calculation moved to YI_FI_ARAGING - see note above.
       @UI.selectionField: [{ position: 61 }]
-      @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_FI_AGINGCAT_VH', element: 'AgingCategory' }, qualifier: 'Billing' }]
+      @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_FI_AGINGCAT_VH', element: 'InvoiceDateStatus' }, qualifier: 'Billing' }]
       AgingCategoryBilling,
 
       // ---- Aging amount buckets, Actual Billing Date basis ----

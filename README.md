@@ -553,3 +553,27 @@ instead of the invalid `groupId` property.
 Confirmed the 14 aging bucket fields have no `@UI.lineItem` in the main consumption view either,
 so they were never intended to appear as columns in the flat list report - only grouped in the
 object page facets, consistent with the corrected `@UI.fieldGroup`-only approach.
+
+## Twenty-second pass - fixed real field-name mismatch confirmed via live ADT screenshot
+
+Real ADT warnings during service binding activation: "Annotated element 'AgingCategory' at
+'AgingCategoryInvoice'/'AgingCategoryBilling' in 'YC_FI_ARAGING' not equal to element in view
+'YI_FI_AGINGCAT_VH'" and "Element 'AgingCategory' for value help 'YI_FI_AGINGCAT_VH' is invalid".
+
+Root cause, confirmed via a direct ADT screenshot of the person's real, live activated
+`YI_FI_AGINGCAT_VH` object: the actual field names are **`InvoiceDateStatus`** /
+**`InvoiceDateStatusText`** (char20/char40), NOT `AgingCategory`/`AgingCategoryText` (char10/char40)
+as our repo had it. My earlier speculation that this was a data-type/length mismatch was wrong -
+confirmed now to be a field name mismatch, verified with direct evidence rather than guessed.
+
+I do not know why the real object uses `InvoiceDateStatus` rather than `AgingCategory` - could be
+an intentional rename on the person's side; not something I can explain, only correct for.
+
+**Fixed in three places to stay consistent:**
+- `yi_fi_agingcat_vh.ddls.asddls` - custom entity field names/lengths corrected to match the real
+  live object.
+- `ycl_fi_agingcat_vh.clas.abap` - internal structure field names and the `char20` length corrected
+  to match (`set_data` requires the internal table field names to match the custom entity element
+  names for the framework to map values correctly).
+- `yc_fi_araging.ddls.asddls` - both `@Consumption.valueHelpDefinition` references (Invoice and
+  Billing qualifiers) updated from `element: 'AgingCategory'` to `element: 'InvoiceDateStatus'`.
