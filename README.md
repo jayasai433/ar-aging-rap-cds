@@ -345,3 +345,17 @@ those 4 objects specifically.
 files can be temporarily excluded or ignored via abapGit's ignore-list), since those are now
 following a validated pattern. Then tackle DDLX/CLAS/SRVD metadata format via the same
 isolated-single-object-test approach that worked for DDLS, rather than guessing at the schema.
+
+## Twelfth pass - CLAS metadata XML added
+
+Found a genuinely well-verified schema this time - confirmed consistently across abapGit's own
+official documentation AND a real class file from a well-known abapGit contributor's public repo
+(`larshp/ABAP-Swagger`), both showing the identical `<VSEOCLASS>` structure. Higher confidence than
+the DDLS schema guess, since two independent real sources agree exactly.
+
+Added `ycl_fi_invstatus_vh.clas.xml` and `ycl_fi_agingcat_vh.clas.xml`, both lowercase, following
+this confirmed structure (CLSNAME, LANGU, DESCRIPT, STATE=1, CLSCCINCL=X, FIXPT=X, UNICODE=X).
+
+**Still missing:** DDLX (metadata extension) and SRVD (service definition) metadata XML - no
+verified example found for either yet. These two object types remain the last gap before the full
+repo is abapGit-pullable.
