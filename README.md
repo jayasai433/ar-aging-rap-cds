@@ -509,3 +509,27 @@ a full rebuild, or a different UI mechanism entirely) - flagged as an open item,
 other) - one earlier search result showed `$session.system_date` commented out in a real example,
 suggesting possible unreliability. The person should confirm the correct name via ADT autocomplete
 before activating.
+
+## Twentieth pass - real, verified DDLX and SRVD metadata XML found
+
+Major breakthrough: the person's `ABAP_Trail_Account` GitHub repo (checked directly with the
+person's permission and PAT) contains REAL, actually-pulled/pushed abapGit files for DDLX and
+SRVD/SRVB object types, from their own prior work. This gives genuinely verified schemas, unlike
+the earlier best-effort guesses.
+
+**Confirmed real DDLX schema** (from `zc_book_copy.ddlx.xml`): includes `<NAME>`, `<DESCRIPTION>`,
+`<MASTER_LANGUAGE>` fields under `<METADATA>`. Applied to `yc_fi_araging.ddlx.xml`.
+
+**Confirmed real SRVD schema** (from `zui_book_copy_o4.srvd.xml`): includes `<NAME>`, `<TYPE>`,
+`<DESCRIPTION>`, `<LANGUAGE>`, `<MASTER_LANGUAGE>`, `<SOURCE_URI>`, `<SOURCE_TYPE>`,
+`<SOURCE_ORIGIN_DESCRIPTION>`, `<SRVD_SOURCE_TYPE>`, `<SRVD_SOURCE_TYPE_DESC>`. Applied to
+`yui_fi_araging_srv.srvd.xml`.
+
+A real SRVB (service binding) example was also found (`zui_book_copy_o4.srvb.xml`), confirming
+OData V4, but a service binding was NOT created as a file here - per earlier notes, this is
+normally created via ADT's wizard rather than hand-authored, and doing so requires the service
+definition to already exist and be activated first.
+
+**Earlier unverified/guessed `yc_fi_araging.ddlx.xml`** (created on the isolated
+`abapgit-ddlx-test` branch) is now superseded by this confirmed-schema version on the main dev
+branch.
