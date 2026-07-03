@@ -1,6 +1,0 @@
-@EndUserText.label: 'AR Aging Report Service'
-define service YUI_FI_ARAGING_SRV {
-  expose YC_FI_ARAGING;
-  expose YI_FI_INVSTATUS_VH;
-  expose YI_FI_AGINGCAT_VH;
-}
