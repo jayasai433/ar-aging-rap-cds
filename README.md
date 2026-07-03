@@ -428,3 +428,30 @@ all consistently showing `io_response->set_data(...)` called directly, never thr
 
 **Fixed:** both classes now call `io_response->set_total_number_of_records(...)` and
 `io_response->set_data(...)` directly, removing the incorrect `io_request->get_response()` chain.
+
+## Seventeenth pass - major fix: CASE expressions moved out of Projection view
+
+**The person correctly pushed back on my first two diagnoses of the "contains a not supported
+expression" error** (I initially guessed it was about value help annotation placement, then
+guessed it was about missing currency annotations - both wrong). The real cause, confirmed via a
+real SAP Community thread describing the identical symptom: **CASE expressions (calculated fields)
+are not supported directly inside a Projection view** (`YC_FI_ARAGING` uses `as projection on`),
+even though identical logic works fine in a regular view entity. I have not independently verified
+this is officially documented by SAP beyond that community thread, but the symptom match (same
+exact error message, same exact context: projection view vs. regular view entity) was precise.
+
+**Fix:** every calculated CASE expression - `InvoiceStatus`, `AgingCategoryInvoice`,
+`AgingCategoryBilling`, and all 14 aging amount bucket columns - moved from `YC_FI_ARAGING`
+(projection) up into `YI_FI_ARAGING` (regular view entity) as flat, pre-calculated columns.
+`YC_FI_ARAGING` now only references them as plain passthrough fields, with UI/value-help/currency
+annotations restated on the passthrough references (annotations on plain passthrough fields are
+fine - only live CASE expressions were the problem).
+
+Confirmed via SAP's own official sample repo (`SAP-samples/abap-cheat-sheets`) that referencing a
+previously-defined alias later in the same SELECT list (e.g. `AgingDaysInvoice` used inside the
+`AgingCategoryInvoice` CASE, both in `YI_FI_ARAGING`) is valid, supported CDS syntax - not
+something I want to leave as an unverified assumption given how much today's build relied on
+catching wrong assumptions.
+
+This was a substantial structural fix, not a small annotation tweak - worth a full re-activation
+test of both `YI_FI_ARAGING` and `YC_FI_ARAGING` from scratch.

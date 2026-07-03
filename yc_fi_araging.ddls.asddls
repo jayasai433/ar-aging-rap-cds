@@ -130,16 +130,13 @@ define root view entity YC_FI_ARAGING
       // =========================================================
       // Invoice Status - NULL-safe, fixed-value dropdown
       // =========================================================
+      // Calculation moved to YI_FI_ARAGING (2026-07-03) - CASE expressions
+      // are not supported directly in a Projection view. This is now a plain
+      // passthrough reference.
       @UI.lineItem: [{ position: 140 }]
       @UI.selectionField: [{ position: 50 }]
       @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_FI_INVSTATUS_VH', element: 'InvoiceStatus' } }]
-      case
-        when RemainingAmount = InvoiceAmount or PaidAmount = 0 or PaidAmount is null
-          then 'Open'
-        when RemainingAmount = 0
-          then 'Cleared'
-        else 'Partially Paid'
-      end as InvoiceStatus,
+      InvoiceStatus,
 
       // =========================================================
       // Invoice Date basis
@@ -148,34 +145,29 @@ define root view entity YC_FI_ARAGING
       EffectiveAgingDate as EffectiveDateInvoice,
       AgingDaysInvoice,
 
+      // Calculation moved to YI_FI_ARAGING - see note above.
       @UI.selectionField: [{ position: 60 }]
       @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_FI_AGINGCAT_VH', element: 'AgingCategory' }, qualifier: 'Invoice' }]
-      case
-        when AgingDaysInvoice < 1            then 'Ondue'
-        when AgingDaysInvoice between 1   and 30  then '1-30'
-        when AgingDaysInvoice between 31  and 60  then '31-60'
-        when AgingDaysInvoice between 61  and 90  then '61-90'
-        when AgingDaysInvoice between 91  and 120 then '91-120'
-        when AgingDaysInvoice between 121 and 180 then '121-180'
-        when AgingDaysInvoice between 181 and 365 then '181-365'
-        else '>365'
-      end as AgingCategoryInvoice,
+      AgingCategoryInvoice,
 
       // ---- Aging amount buckets, Invoice Date basis ----
+      // Calculations moved to YI_FI_ARAGING - see note above. Annotations
+      // kept here too since currency semantics should be restated at each
+      // projection layer per the earlier propagation-gap fix.
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 1 and 30 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv0130,
+      AmtInv0130,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 31 and 60 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv3160,
+      AmtInv3160,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 61 and 90 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv6190,
+      AmtInv6190,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 91 and 120 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv91120,
+      AmtInv91120,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 121 and 180 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv121180,
+      AmtInv121180,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice between 181 and 365 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInv181365,
+      AmtInv181365,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysInvoice > 365 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtInvOver365,
+      AmtInvOver365,
 
       // =========================================================
       // Actual Billing Date basis
@@ -183,34 +175,26 @@ define root view entity YC_FI_ARAGING
       DueDateByBilling,
       AgingDaysBilling,
 
+      // Calculation moved to YI_FI_ARAGING - see note above.
       @UI.selectionField: [{ position: 61 }]
       @Consumption.valueHelpDefinition: [{ entity: { name: 'YI_FI_AGINGCAT_VH', element: 'AgingCategory' }, qualifier: 'Billing' }]
-      case
-        when AgingDaysBilling < 1            then 'Ondue'
-        when AgingDaysBilling between 1   and 30  then '1-30'
-        when AgingDaysBilling between 31  and 60  then '31-60'
-        when AgingDaysBilling between 61  and 90  then '61-90'
-        when AgingDaysBilling between 91  and 120 then '91-120'
-        when AgingDaysBilling between 121 and 180 then '121-180'
-        when AgingDaysBilling between 181 and 365 then '181-365'
-        else '>365'
-      end as AgingCategoryBilling,
+      AgingCategoryBilling,
 
       // ---- Aging amount buckets, Actual Billing Date basis ----
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 1 and 30 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil0130,
+      AmtBil0130,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 31 and 60 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil3160,
+      AmtBil3160,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 61 and 90 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil6190,
+      AmtBil6190,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 91 and 120 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil91120,
+      AmtBil91120,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 121 and 180 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil121180,
+      AmtBil121180,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling between 181 and 365 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBil181365,
+      AmtBil181365,
       @Semantics.amount.currencyCode: 'CompanyCodeCurrency'
-      case when AgingDaysBilling > 365 then RemainingAmount else cast( 0 as abap.curr( 23, 2 ) ) end as AmtBilOver365,
+      AmtBilOver365,
 
       _Customer,
       _CustomerCompany,
