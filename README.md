@@ -475,3 +475,37 @@ reference a previous alias" to mean bare names work, when the sample actually sh
 bare references remain. One additional fix: a bare `InvoiceAmount` reference (inside the
 InvoiceStatus CASE) was changed to the unambiguous `Item.InvoiceAmount` form instead, avoiding
 the same-list-alias mechanism entirely for that one reference.
+
+## Nineteenth pass - resolved parameter-not-allowed restriction, real functionality loss
+
+Real, confirmed ADT error: "Parameters are prohibited in Transactional Projected Views." Verified
+against official SAP ABAP Keyword Documentation - `provider contract transactional_query` (what
+`YC_FI_ARAGING` must use, given its calculated fields and non-cube source) genuinely cannot declare
+or pass through CDS parameters. This is architectural, not a syntax fix.
+
+**Alternatives researched and ruled out:**
+- `analytical_query` - the only contract that supports parameters, but requires the source to be
+  an analytical cube view (`@dataCategory: #CUBE`), mandates
+  `@AccessControl.authorizationCheck: #NOT_ALLOWED`, cannot be accessed via ABAP SQL, and cannot be
+  used as a data source for other CDS entities. Would require rebuilding most of the stack, not a
+  contained fix.
+- `transactional_interface` - restricts the feature set to only what exists in the projected
+  entity; no new fields, associations, or virtual elements allowed. Incompatible with our
+  calculated-field-heavy design.
+- `sql_query` - appeared as an ADT autocomplete option but is not documented in any official SAP
+  source found. The person confirmed directly (checked in their own ADT/system) that it's not
+  supported yet in this environment.
+
+**Fix applied:** `YC_FI_ARAGING` no longer declares `P_KeyDate` as a parameter. It now passes a
+fixed value through to `YI_FI_ARAGING`: `YI_FI_ARAGING( P_KeyDate: $session.system_date )`.
+
+**Real functionality loss, flagged clearly:** Key Date is no longer user-overridable at the report
+level - it always equals the current system date. This does not fully satisfy the original spec
+sheet's requirement ("Key Date... like current date but can be changed"). If interactive Key Date
+override is a hard requirement, it would need a different architecture (e.g. analytical_query with
+a full rebuild, or a different UI mechanism entirely) - flagged as an open item, not resolved.
+
+**Unverified:** the exact session variable name (`$session.system_date` vs `$session.user_date` or
+other) - one earlier search result showed `$session.system_date` commented out in a real example,
+suggesting possible unreliability. The person should confirm the correct name via ADT autocomplete
+before activating.

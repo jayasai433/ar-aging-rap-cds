@@ -9,10 +9,17 @@
 }
 define root view entity YC_FI_ARAGING
   provider contract transactional_query
-  with parameters
-    @Environment.systemField: #SYSTEM_DATE
-    P_KeyDate : abap.dats
-  as projection on YI_FI_ARAGING( P_KeyDate: $parameters.P_KeyDate )
+  // CONFIRMED real restriction: "Parameters are prohibited in Transactional
+  // Projected Views" - transactional_query does not support parameters at
+  // all. Verified against official SAP documentation. Key Date is therefore
+  // fixed to system date here, not user-overridable at this layer -
+  // functionality loss versus the original spec sheet requirement
+  // ("Key Date... like current date but can be changed"). Alternatives
+  // considered and ruled out: analytical_query (requires an analytical cube
+  // view source, incompatible with our design), transactional_interface
+  // (no new fields/associations allowed), sql_query (not supported in this
+  // system's release, per the person's direct check in ADT).
+  as projection on YI_FI_ARAGING( P_KeyDate: $session.system_date )
 {
   key AccountingDocument,
   key FiscalYear,
