@@ -1,54 +1,226 @@
 @Metadata.layer: #CUSTOMER
 @UI.headerInfo: {
   typeName: 'AR Invoice',
-  typeNamePlural: 'AR Invoices'
+  typeNamePlural: 'AR Invoices',
+  title: { type: #STANDARD, value: 'JournalEntry' }
 }
 @UI.facet: [
-  { id: 'GeneralInfo',  type: #COLLECTION, label: 'General Information',     position: 10 },
-  { id: 'AgingInvoice', type: #COLLECTION, label: 'Data by Invoice Date',    position: 20 },
-  { id: 'AgingBilling', type: #COLLECTION, label: 'Data by Actual Billing Date', position: 30 }
+  { id: 'GeneralInfo',      type: #COLLECTION,         label: 'General Information',         position: 10 },
+  { id: 'GeneralInfoGrp',   type: #FIELDGROUP_REFERENCE, label: 'General Information',
+    targetQualifier: 'GenInfo', position: 10, parentId: 'GeneralInfo' },
+
+  { id: 'AgingInvoice',     type: #COLLECTION,         label: 'Data by Invoice Date',        position: 20 },
+  { id: 'AgingInvoiceGrp',  type: #FIELDGROUP_REFERENCE, label: 'Aging Details (Invoice Date)',
+    targetQualifier: 'AgingInv', position: 10, parentId: 'AgingInvoice' },
+  { id: 'AgingInvoiceAmtGrp', type: #FIELDGROUP_REFERENCE, label: 'Aging Amounts (Invoice Date)',
+    targetQualifier: 'AgingInvAmt', position: 20, parentId: 'AgingInvoice' },
+
+  { id: 'AgingBilling',     type: #COLLECTION,         label: 'Data by Actual Billing Date', position: 30 },
+  { id: 'AgingBillingGrp',  type: #FIELDGROUP_REFERENCE, label: 'Aging Details (Billing Date)',
+    targetQualifier: 'AgingBil', position: 10, parentId: 'AgingBilling' },
+  { id: 'AgingBillingAmtGrp', type: #FIELDGROUP_REFERENCE, label: 'Aging Amounts (Billing Date)',
+    targetQualifier: 'AgingBilAmt', position: 20, parentId: 'AgingBilling' }
 ]
 annotate entity YC_ARAGING with
 {
-  @UI.lineItem: [{ position: 200, groupId: 'AgingInvoice' }]
+  // ══════════════════════ General Information ══════════════════════
+  @UI.lineItem:   [{ position: 10, groupId: 'GeneralInfo', importance: #HIGH }]
+  @UI.selectionField: [{ position: 10 }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 10, label: 'Fiscal Year' }]
+  FiscalYearNum;
+
+  @UI.lineItem:   [{ position: 20, groupId: 'GeneralInfo', importance: #HIGH }]
+  @UI.selectionField: [{ position: 20 }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 20, label: 'Company' }]
+  CompanyCodeOut;
+
+  @UI.lineItem:   [{ position: 21, groupId: 'GeneralInfo', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 21, label: 'Company Name' }]
+  CompanyName;
+
+  @UI.lineItem:   [{ position: 30, groupId: 'GeneralInfo', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 30, label: 'Company Branch' }]
+  CompanyBranch;
+
+  @UI.lineItem:   [{ position: 35, groupId: 'GeneralInfo', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 35, label: 'BP Group' }]
+  BPGroupCode;
+
+  @UI.lineItem:   [{ position: 36, groupId: 'GeneralInfo', importance: #LOW }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 36, label: 'BP Group Name' }]
+  BPGroupName;
+
+  @UI.lineItem:   [{ position: 40, groupId: 'GeneralInfo', importance: #HIGH }]
+  @UI.selectionField: [{ position: 30 }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 40, label: 'Customer Code' }]
+  CustomerCode;
+
+  @UI.lineItem:   [{ position: 41, groupId: 'GeneralInfo', importance: #HIGH }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 41, label: 'Customer Name' }]
+  CustomerName;
+
+  @UI.lineItem:   [{ position: 42, groupId: 'GeneralInfo', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 42, label: 'Customer Branch' }]
+  CustomerBranch;
+
+  @UI.lineItem:   [{ position: 50, groupId: 'GeneralInfo', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 50, label: 'GL Account' }]
+  GLAccount;
+
+  @UI.lineItem:   [{ position: 51, groupId: 'GeneralInfo', importance: #LOW }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 51, label: 'GL Account Name' }]
+  GLAccountName;
+
+  @UI.lineItem:   [{ position: 60, groupId: 'GeneralInfo', importance: #HIGH }]
+  @UI.selectionField: [{ position: 40 }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 60, label: 'Document Type' }]
+  DocumentType;
+
+  @UI.lineItem:   [{ position: 70, groupId: 'GeneralInfo', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 70, label: 'Journal Entry' }]
+  JournalEntry;
+
+  @UI.lineItem:   [{ position: 80, groupId: 'GeneralInfo', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 80, label: 'Invoice Number' }]
+  InvoiceReference;
+
+  @UI.lineItem:   [{ position: 85, groupId: 'GeneralInfo', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 85, label: 'Billing Number' }]
+  BillingNumber;
+
+  @UI.lineItem:   [{ position: 90, groupId: 'GeneralInfo', importance: #LOW }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 90, label: 'Invoice Description' }]
+  InvoiceDescription;
+
+  @UI.lineItem:   [{ position: 100, groupId: 'GeneralInfo', importance: #LOW }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 100, label: 'Project' }]
+  WBSElementInternalID;
+
+  @UI.lineItem:   [{ position: 101, groupId: 'GeneralInfo', importance: #LOW }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 101, label: 'Project Name' }]
+  ProjectName;
+
+  @UI.lineItem:   [{ position: 102, groupId: 'GeneralInfo', importance: #LOW }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 102, label: 'Sales Name' }]
+  SalesName;
+
+  @UI.lineItem:   [{ position: 105, groupId: 'GeneralInfo', importance: #HIGH }]
+  @UI.selectionField: [{ position: 50 }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 105, label: 'Invoice Status' }]
+  InvoiceStatus;
+
+  @UI.lineItem:   [{ position: 110, groupId: 'GeneralInfo', importance: #HIGH }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 110, label: 'Invoice Amount' }]
+  InvoiceAmount;
+
+  @UI.lineItem:   [{ position: 120, groupId: 'GeneralInfo', importance: #HIGH }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 120, label: 'Paid Amount' }]
+  PaidAmount;
+
+  @UI.lineItem:   [{ position: 130, groupId: 'GeneralInfo', importance: #HIGH }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 130, label: 'Remaining Amount' }]
+  RemainingAmount;
+
+  @UI.lineItem:   [{ position: 135, groupId: 'GeneralInfo', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 135, label: 'Posting Date' }]
+  PostingDate;
+
+  @UI.lineItem:   [{ position: 136, groupId: 'GeneralInfo', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'GenInfo', position: 136, label: 'Baseline Date' }]
+  BaselineDate;
+
+  // ══════════════════════ Aging by Invoice Date ══════════════════════
+  @UI.lineItem:   [{ position: 150, groupId: 'AgingInvoice', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInv', position: 10, label: 'Payment Term' }]
+  PaymentTermsText;
+
+  @UI.lineItem:   [{ position: 151, groupId: 'AgingInvoice', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInv', position: 20, label: 'Key Date' }]
+  KeyDateOut;
+
+  @UI.lineItem:   [{ position: 152, groupId: 'AgingInvoice', importance: #HIGH }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInv', position: 30, label: 'Due Date' }]
+  DueDateByInvoice;
+
+  @UI.lineItem:   [{ position: 153, groupId: 'AgingInvoice', importance: #HIGH }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInv', position: 40, label: 'Aging (Days)' }]
+  AgingDaysInvoice;
+
+  @UI.lineItem:   [{ position: 154, groupId: 'AgingInvoice', importance: #HIGH }]
+  @UI.selectionField: [{ position: 60 }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInv', position: 50, label: 'Aging Category' }]
+  AgingCategoryInvoice;
+
+  @UI.lineItem:   [{ position: 200, groupId: 'AgingInvoice', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInvAmt', position: 10, label: '1-30' }]
   AmtInv0130;
 
-  @UI.lineItem: [{ position: 201, groupId: 'AgingInvoice' }]
+  @UI.lineItem:   [{ position: 201, groupId: 'AgingInvoice', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInvAmt', position: 20, label: '31-60' }]
   AmtInv3160;
 
-  @UI.lineItem: [{ position: 202, groupId: 'AgingInvoice' }]
+  @UI.lineItem:   [{ position: 202, groupId: 'AgingInvoice', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInvAmt', position: 30, label: '61-90' }]
   AmtInv6190;
 
-  @UI.lineItem: [{ position: 203, groupId: 'AgingInvoice' }]
+  @UI.lineItem:   [{ position: 203, groupId: 'AgingInvoice', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInvAmt', position: 40, label: '91-120' }]
   AmtInv91120;
 
-  @UI.lineItem: [{ position: 204, groupId: 'AgingInvoice' }]
+  @UI.lineItem:   [{ position: 204, groupId: 'AgingInvoice', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInvAmt', position: 50, label: '121-180' }]
   AmtInv121180;
 
-  @UI.lineItem: [{ position: 205, groupId: 'AgingInvoice' }]
+  @UI.lineItem:   [{ position: 205, groupId: 'AgingInvoice', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInvAmt', position: 60, label: '181-365' }]
   AmtInv181365;
 
-  @UI.lineItem: [{ position: 206, groupId: 'AgingInvoice' }]
+  @UI.lineItem:   [{ position: 206, groupId: 'AgingInvoice', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingInvAmt', position: 70, label: '>365' }]
   AmtInvOver365;
 
-  @UI.lineItem: [{ position: 210, groupId: 'AgingBilling' }]
+  // ══════════════════════ Aging by Actual Billing Date ══════════════════════
+  @UI.lineItem:   [{ position: 160, groupId: 'AgingBilling', importance: #LOW }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBil', position: 10, label: 'Receipt/Payment Date' }]
+  ClearingDate;
+
+  @UI.lineItem:   [{ position: 161, groupId: 'AgingBilling', importance: #HIGH }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBil', position: 20, label: 'Due Date' }]
+  DueDateByBilling;
+
+  @UI.lineItem:   [{ position: 162, groupId: 'AgingBilling', importance: #HIGH }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBil', position: 30, label: 'Aging (Days)' }]
+  AgingDaysBilling;
+
+  @UI.lineItem:   [{ position: 163, groupId: 'AgingBilling', importance: #HIGH }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBil', position: 40, label: 'Aging Category' }]
+  AgingCategoryBilling;
+
+  @UI.lineItem:   [{ position: 210, groupId: 'AgingBilling', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBilAmt', position: 10, label: '1-30' }]
   AmtBil0130;
 
-  @UI.lineItem: [{ position: 211, groupId: 'AgingBilling' }]
+  @UI.lineItem:   [{ position: 211, groupId: 'AgingBilling', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBilAmt', position: 20, label: '31-60' }]
   AmtBil3160;
 
-  @UI.lineItem: [{ position: 212, groupId: 'AgingBilling' }]
+  @UI.lineItem:   [{ position: 212, groupId: 'AgingBilling', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBilAmt', position: 30, label: '61-90' }]
   AmtBil6190;
 
-  @UI.lineItem: [{ position: 213, groupId: 'AgingBilling' }]
+  @UI.lineItem:   [{ position: 213, groupId: 'AgingBilling', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBilAmt', position: 40, label: '91-120' }]
   AmtBil91120;
 
-  @UI.lineItem: [{ position: 214, groupId: 'AgingBilling' }]
+  @UI.lineItem:   [{ position: 214, groupId: 'AgingBilling', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBilAmt', position: 50, label: '121-180' }]
   AmtBil121180;
 
-  @UI.lineItem: [{ position: 215, groupId: 'AgingBilling' }]
+  @UI.lineItem:   [{ position: 215, groupId: 'AgingBilling', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBilAmt', position: 60, label: '181-365' }]
   AmtBil181365;
 
-  @UI.lineItem: [{ position: 216, groupId: 'AgingBilling' }]
+  @UI.lineItem:   [{ position: 216, groupId: 'AgingBilling', importance: #MEDIUM }]
+  @UI.fieldGroup: [{ qualifier: 'AgingBilAmt', position: 70, label: '>365' }]
   AmtBilOver365;
 }
