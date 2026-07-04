@@ -83,6 +83,14 @@ define view entity YI_FI_AROPITEM
       Item.GLAccountName                 as GLAccountName,             // CONFIRMED direct field, association removed
       Item._AccountingDocumentType.AccountingDocumentType as DocumentType, // CONFIRMED path via association per screenshot
       Item.AccountingDocument            as JournalEntry,
+
+      // PLACEHOLDER field - not yet confirmed which real field on
+      // I_OperationalAcctgDocCube corresponds to "Invoice Number" per the
+      // spec sheet. Mapped to DocumentReferenceID as a guess/dummy so the
+      // field exists end-to-end and is easy to swap later. VERIFY AND
+      // REPLACE the field name below once confirmed.
+      Item.DocumentReferenceID           as InvoiceReference,
+
       Item.BillingDocument               as BillingNumber,             // CONFIRMED direct field
       Item.AccountingDocumentHeaderText  as InvoiceDescription,        // CONFIRMED direct field, header association removed
       Item.WBSElementInternalID          as WBSElementInternalID,

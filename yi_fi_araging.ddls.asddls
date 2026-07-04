@@ -27,6 +27,7 @@ define view entity YI_FI_ARAGING
       Item.GLAccountName,
       Item.DocumentType,
       Item.JournalEntry,
+      Item.InvoiceReference,
       Item.BillingNumber,
       Item.InvoiceDescription,
       Item.WBSElementInternalID,
