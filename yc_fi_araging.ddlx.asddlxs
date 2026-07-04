@@ -2,7 +2,8 @@
 @UI: {
   headerInfo: {
     typeName: 'AR Invoice',
-    typeNamePlural: 'AR Invoices'
+    typeNamePlural: 'AR Invoices',
+    title: { type: #STANDARD, value: 'JournalEntry' }
   }
 }
 annotate entity YC_FI_ARAGING with
@@ -27,45 +28,198 @@ annotate entity YC_FI_ARAGING with
   // check, likely involving freestyle UI5 extension if List Report group headers
   // don't support it out of the box.
 
+  // ══════════════════════ General Information ══════════════════════
+  @UI.lineItem: [{ position: 10 }]
+  @UI.selectionField: [{ position: 10 }]
+  FiscalYearNum;
+
+  @UI.lineItem: [{ position: 20 }]
+  @UI.selectionField: [{ position: 20 }]
+  CompanyCodeOut;
+
+  @UI.lineItem: [{ position: 30 }]
+  @UI.selectionField: [{ position: 21 }]
+  // No verified value-help target for Business Place at this level -
+  // filterable as free text/exact match, no dropdown.
+  CompanyBranch;
+
+  @UI.lineItem: [{ position: 35 }]
+  @UI.selectionField: [{ position: 25 }]
+  // Dropdown removed per instruction - only Invoice Status and Aging
+  // Category should have value help dropdowns. Filterable as exact
+  // match/text, no dropdown.
+  BPGroupCode;
+
+  @UI.lineItem: [{ position: 40 }]
+  @UI.selectionField: [{ position: 30 }]
+  // Dropdown removed per instruction - only Invoice Status and Aging
+  // Category should have value help dropdowns.
+  CustomerCode;
+
+  @UI.lineItem: [{ position: 41 }]
+  CustomerName;
+
+  @UI.lineItem: [{ position: 42 }]
+  @UI.selectionField: [{ position: 31 }]
+  // No verified value-help target - filterable, no dropdown.
+  CustomerBranch;
+
+  @UI.lineItem: [{ position: 50 }]
+  @UI.selectionField: [{ position: 45 }]
+  // Dropdown removed per instruction - only Invoice Status and Aging
+  // Category should have value help dropdowns. Filterable as exact
+  // match/text, no dropdown.
+  GLAccount;
+
+  @UI.lineItem: [{ position: 51 }]
+  GLAccountName;
+
+  @UI.lineItem: [{ position: 60 }]
+  @UI.selectionField: [{ position: 40 }]
+  DocumentType;
+
+  @UI.lineItem: [{ position: 70 }]
+  @UI.selectionField: [{ position: 70 }]
+  JournalEntry;
+
+  @UI.lineItem: [{ position: 80 }]
+  @UI.selectionField: [{ position: 46 }]
+  // PLACEHOLDER field - see YI_FI_AROPITEM comment. VERIFY the real
+  // source field before relying on this in production.
+  InvoiceReference;
+
+  @UI.lineItem: [{ position: 90 }]
+  BillingNumber;
+
+  @UI.lineItem: [{ position: 91 }]
+  InvoiceDescription;
+
+  @UI.lineItem: [{ position: 100 }]
+  // NOT adding a selection field here - WBSElementInternalID's related
+  // description field (I_WBSElementBasicData) was confirmed NOT released
+  // for Developer Extensibility (see README/conversation). Filtering on
+  // the raw ID alone may still work, but leaving this unfiltered until
+  // that WBS access question is resolved, to avoid half-working UX.
+  WBSElementInternalID;
+
+  @UI.lineItem: [{ position: 101 }]
+  ProjectName;
+
+  @UI.lineItem: [{ position: 102 }]
+  @UI.selectionField: [{ position: 90 }]
+  // Derived from our deterministic YI_FI_ARSLSPTNR (MIN-based pick) -
+  // no dropdown, since this isn't a stable master-data value help target.
+  SalesName;
+
+  @UI.lineItem: [{ position: 105 }]
+  @UI.selectionField: [{ position: 50 }]
+  InvoiceStatus;
+
+  @UI.lineItem: [{ position: 111 }]
+  InvoiceAmount;
+
+  @UI.lineItem: [{ position: 120 }]
+  PaidAmount;
+
+  @UI.lineItem: [{ position: 130 }]
+  RemainingAmount;
+
+  @UI.lineItem: [{ position: 135 }]
+  PostingDate;
+
+  @UI.lineItem: [{ position: 136 }]
+  BaselineDate;
+
+  @UI.lineItem: [{ position: 137 }]
+  @UI.selectionField: [{ position: 80 }]
+  // No verified value-help target for payment terms text - filterable,
+  // no dropdown.
+  PaymentTermsCode;
+
+  @UI.lineItem: [{ position: 138 }]
+  NetPaymentDays;
+
+  @UI.lineItem: [{ position: 139 }]
+  KeyDateOut;
+
+  @UI.lineItem: [{ position: 145 }]
+  ActualBillingDate;
+
+  // ══════════════════════ Aging by Invoice Date ══════════════════════
+  @UI.lineItem: [{ position: 150 }]
+  DueDateByInvoice;
+
+  @UI.lineItem: [{ position: 151 }]
+  AgingDaysInvoice;
+
+  @UI.lineItem: [{ position: 152 }]
+  @UI.selectionField: [{ position: 60 }]
+  AgingCategoryInvoice;
+
+  @UI.lineItem: [{ position: 200 }]
   @UI.fieldGroup: [{ qualifier: 'AgingInvoiceGroup', position: 200 }]
   AmtInv0130;
 
+  @UI.lineItem: [{ position: 201 }]
   @UI.fieldGroup: [{ qualifier: 'AgingInvoiceGroup', position: 201 }]
   AmtInv3160;
 
+  @UI.lineItem: [{ position: 202 }]
   @UI.fieldGroup: [{ qualifier: 'AgingInvoiceGroup', position: 202 }]
   AmtInv6190;
 
+  @UI.lineItem: [{ position: 203 }]
   @UI.fieldGroup: [{ qualifier: 'AgingInvoiceGroup', position: 203 }]
   AmtInv91120;
 
+  @UI.lineItem: [{ position: 204 }]
   @UI.fieldGroup: [{ qualifier: 'AgingInvoiceGroup', position: 204 }]
   AmtInv121180;
 
+  @UI.lineItem: [{ position: 205 }]
   @UI.fieldGroup: [{ qualifier: 'AgingInvoiceGroup', position: 205 }]
   AmtInv181365;
 
+  @UI.lineItem: [{ position: 206 }]
   @UI.fieldGroup: [{ qualifier: 'AgingInvoiceGroup', position: 206 }]
   AmtInvOver365;
 
+  // ══════════════════════ Aging by Actual Billing Date ══════════════════════
+  @UI.lineItem: [{ position: 160 }]
+  DueDateByBilling;
+
+  @UI.lineItem: [{ position: 161 }]
+  AgingDaysBilling;
+
+  @UI.lineItem: [{ position: 162 }]
+  @UI.selectionField: [{ position: 61 }]
+  AgingCategoryBilling;
+
+  @UI.lineItem: [{ position: 210 }]
   @UI.fieldGroup: [{ qualifier: 'AgingBillingGroup', position: 210 }]
   AmtBil0130;
 
+  @UI.lineItem: [{ position: 211 }]
   @UI.fieldGroup: [{ qualifier: 'AgingBillingGroup', position: 211 }]
   AmtBil3160;
 
+  @UI.lineItem: [{ position: 212 }]
   @UI.fieldGroup: [{ qualifier: 'AgingBillingGroup', position: 212 }]
   AmtBil6190;
 
+  @UI.lineItem: [{ position: 213 }]
   @UI.fieldGroup: [{ qualifier: 'AgingBillingGroup', position: 213 }]
   AmtBil91120;
 
+  @UI.lineItem: [{ position: 214 }]
   @UI.fieldGroup: [{ qualifier: 'AgingBillingGroup', position: 214 }]
   AmtBil121180;
 
+  @UI.lineItem: [{ position: 215 }]
   @UI.fieldGroup: [{ qualifier: 'AgingBillingGroup', position: 215 }]
   AmtBil181365;
 
+  @UI.lineItem: [{ position: 216 }]
   @UI.fieldGroup: [{ qualifier: 'AgingBillingGroup', position: 216 }]
   AmtBilOver365;
 }
